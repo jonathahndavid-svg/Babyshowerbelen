@@ -1,76 +1,106 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>App Admin</title>
-  <style>
-    body { font-family: sans-serif; margin: 20px; }
-    label { display: block; margin-top: 10px; }
-    input, textarea { width: 100%; padding: 8px; margin-top: 5px; }
-    button { margin-top: 15px; padding: 10px 15px; cursor: pointer; }
-    .card { border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px; }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>App Admin</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    label { display: block; margin-top: 10px; }
+    input, textarea { width: 100%; padding: 8px; margin-top: 5px; }
+    button { margin-top: 15px; padding: 10px 15px; cursor: pointer; }
+    .card { border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px; }
+  </style>
 </head>
 <body>
-  <h1>Administrador de Datos</h1>
+  <h1>Administrador de Datos</h1>
 
-  <form id="form">
-    <label>Nombre:</label>
-    <input type="text" id="nombre" required>
+  <form id="form">
+    <label>Nombre:</label>
+    <input type="text" id="nombre" required>
 
-    <label>Descripcion:</label>
-    <textarea id="descripcion" required></textarea>
+    <label>Descripcion:</label>
+    <textarea id="descripcion" required></textarea>
 
-    <button type="submit">Guardar</button>
-  </form>
+    <button type="submit">Guardar</button>
+  </form>
 
-  <h2>Registros</h2>
-  <div id="registros"></div>
+  <h2>Registros</h2>
+  <div id="registros"></div>
 
-  <script>
-    // 👇 Cambia esta URL por la de tu Web App publicada
-    const API_URL = "https://script.google.com/macros/s/AKfycbyksGkYG-m1p0TZFiPSf4avkUlCnq_4nI2NlI7BvJsT1WhbmzqRbqe9s7HwlhLhWvFj2Q/exec"; 
+  <script>
+    // 👇 Cambia esta URL por la de tu Web App publicada
+    const API_URL = "https://script.google.com/macros/s/AKfycbyksGkYG-m1p0TZFiPSf4avkUlCnq_4nI2NlI7BvJsT1WhbmzqRbqe9s7HwlhLhWvFj2Q/exec"; 
 
-    async function cargarRegistros() {
-      try {
-        const res = await fetch(API_URL);
-        const data = await res.json();
-        const contenedor = document.getElementById("registros");
-        contenedor.innerHTML = "";
-        data.forEach(item => {
-          const div = document.createElement("div");
-          div.className = "card";
-          div.innerHTML = `<b>${item.ID} - ${item.Nombre}</b><br>${item.Descripcion}`;
-          contenedor.appendChild(div);
-        });
-      } catch (err) {
-        console.error("Error cargando registros:", err);
-      }
-    }
+    async function cargarRegistros() {
+      try {
+        const res = await fetch(API_URL);
+        // Manejo de error de lectura
+        if (!res.ok) {
+            throw new Error(`Error HTTP al cargar: ${res.status} ${res.statusText}`);
+        }
 
-    document.getElementById("form").addEventListener("submit", async e => {
-      e.preventDefault();
-      const body = {
-        Nombre: document.getElementById("nombre").value,
-        Descripcion: document.getElementById("descripcion").value
-      };
-      try {
-     await fetch(API_URL, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(body)
-});
+        const data = await res.json();
+        const contenedor = document.getElementById("registros");
+        contenedor.innerHTML = "";
+        data.forEach(item => {
+          const div = document.createElement("div");
+          div.className = "card";
+          // Asegúrate de que 'ID' y 'Descripcion' coincidan con las cabeceras de tu hoja.
+          div.innerHTML = `<b>${item.ID || item.id} - ${item.Nombre}</b><br>${item.Descripcion || item.descripcion}`;
+          contenedor.appendChild(div);
+        });
+      } catch (err) {
+        console.error("Error cargando registros:", err);
+        document.getElementById("registros").innerHTML = `<p style="color: red;">Error al cargar: ${err.message}</p>`;
+      }
+    }
 
-        e.target.reset();
-        cargarRegistros();
-      } catch (err) {
-        console.error("Error guardando:", err);
-      }
-    });
+    // --- INICIO DE LA FUNCIÓN MEJORADA PARA ESCRIBIR (POST) ---
+    document.getElementById("form").addEventListener("submit", async e => {
+      e.preventDefault();
+      
+      const botonGuardar = e.target.querySelector('button[type="submit"]');
+      botonGuardar.disabled = true; 
+      botonGuardar.textContent = "Guardando...";
 
-    // Cargar al inicio
-    cargarRegistros();
-  </script>
+      const body = {
+        Nombre: document.getElementById("nombre").value,
+        Descripcion: document.getElementById("descripcion").value
+      };
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+
+        // **CLAVE:** Verificamos si la respuesta HTTP es exitosa (código 200-299)
+        if (!res.ok) {
+            throw new Error(`Error en la respuesta del servidor: ${res.status} ${res.statusText}`);
+        }
+
+        const respuestaAPI = await res.json();
+        console.log("Guardado exitoso:", respuestaAPI);
+
+        // Limpiamos el formulario y recargamos los datos
+        e.target.reset();
+        cargarRegistros();
+
+      } catch (err) {
+        console.error("Error guardando:", err);
+        alert(`Hubo un error al guardar: ${err.message}. Revisa la consola para detalles.`);
+      } finally {
+        // Restauramos el botón
+        botonGuardar.disabled = false;
+        botonGuardar.textContent = "Guardar";
+      }
+    });
+    // --- FIN DE LA FUNCIÓN MEJORADA ---
+
+    // Cargar al inicio
+    cargarRegistros();
+  </script>
 </body>
 </html>
