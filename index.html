@@ -56,11 +56,11 @@
         Descripcion: document.getElementById("descripcion").value
       };
       try {
-        await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
+     await fetch(API_URL, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(body)
+});
 
         e.target.reset();
         cargarRegistros();
