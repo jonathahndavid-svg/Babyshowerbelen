@@ -166,7 +166,7 @@
                     // Título
                     const h3 = document.createElement("h3");
                     h3.className = "font-semibold text-indigo-600 text-base";
-                    h3.textContent = row.Título || "Sin título";
+                    h3.textContent = row.titulo || "Sin título";
                     card.appendChild(h3);
 
                     // Fecha
@@ -226,7 +226,7 @@
                     if (row.contenido) {
                         const p = document.createElement("p");
                         p.className = "mt-1 whitespace-pre-line text-gray-700";
-                        p.textContent = row.Contenido;
+                        p.textContent = row.contenido;
                         card.appendChild(p);
                     }
 
