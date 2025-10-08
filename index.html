@@ -1,100 +1,140 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>App Admin</title>
-  <style>
-    body { font-family: sans-serif; margin: 20px; }
-    label { display: block; margin-top: 10px; }
-    input, textarea { width: 100%; padding: 8px; margin-top: 5px; }
-    button { margin-top: 15px; padding: 10px 15px; cursor: pointer; }
-    .card { border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px; }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Iglesia - PWA Publicaciones</title>
+  <link rel="manifest" href="manifest.json" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="icon.png" />
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background-color: #f3f4f6;
+    }
+    .section-hidden {
+      display: none;
+    }
+    .section-active {
+      display: block;
+    }
+    .nav-btn.active svg,
+    .nav-btn.active span {
+      color: #4f46e5;
+      font-weight: 600;
+    }
+  </style>
 </head>
-<body>
-  <h1>Administrador de Datos</h1>
+<body class="flex flex-col min-h-screen">
+  <main class="flex-1 p-4">
+    <!-- 🏠 Sección principal -->
+    <div id="section-inicio" class="section-active bg-white p-4 rounded-xl shadow-md text-center">
+      <h1 class="text-xl font-semibold mb-2">Bienvenido 🙌</h1>
+      <p class="text-gray-600">Explora las publicaciones más recientes de la iglesia.</p>
+    </div>
 
-  <form id="form">
-    <label>Nombre:</label>
-    <input type="text" id="nombre" required>
+    <!-- 📰 Sección de Publicaciones -->
+    <div id="section-publicaciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-semibold">📰 Publicaciones</h2>
+        <button onclick="cargarPublicaciones()" class="text-sm text-indigo-600 font-medium hover:underline flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v6h6M20 20v-6h-6M4 20l16-16"/>
+          </svg>
+          Actualizar
+        </button>
+      </div>
+      <div id="lista-publicaciones" class="space-y-3 text-gray-700 text-sm">
+        <p class="text-center text-gray-400">Cargando publicaciones...</p>
+      </div>
+    </div>
+  </main>
 
-    <label>Descripcion:</label>
-    <textarea id="descripcion" required></textarea>
+  <!-- 📱 Barra de navegación inferior -->
+  <nav class="bg-white shadow-inner flex justify-around p-2 border-t">
+    <button class="nav-btn flex flex-col items-center active" data-section="inicio">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h6m8-11v10a1 1 0 01-1 1h-6"/>
+      </svg>
+      <span class="text-xs">Inicio</span>
+    </button>
 
-    <button type="submit">Guardar</button>
-  </form>
+    <button class="nav-btn flex flex-col items-center" data-section="publicaciones">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      <span class="text-xs">Publicaciones</span>
+    </button>
+  </nav>
 
-  <h2>Registros</h2>
-  <div id="registros"></div>
+  <!-- 📦 Librería PapaParse -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
-  <script>
-    // 👇 ¡URL de tu nueva Web App actualizada!
-    const API_URL = "https://script.google.com/macros/s/AKfycbz-brTGcLHJZ_3x2TjCSljgh7v1k4xtlDmuzkTEZ88Btxg7xevNg-NXJ0B2DGCy4cduaA/exec"; 
+  <script>
+  // 👉 URL de tu hoja de Google Sheets (CSV)
+  const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
 
-    async function cargarRegistros() {
-      try {
-        const res = await fetch(API_URL);
-        if (!res.ok) {
-            throw new Error(`Error HTTP al cargar: ${res.status} ${res.statusText}`);
-        }
+  // 👉 Cambiar secciones de navegación
+  document.querySelectorAll(".nav-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const sectionId = "section-" + btn.dataset.section;
+      document.querySelectorAll("main > div").forEach(div => div.classList.add("section-hidden"));
+      document.getElementById(sectionId).classList.remove("section-hidden");
+      document.getElementById(sectionId).classList.add("section-active");
+    });
+  });
 
-        const data = await res.json();
-        const contenedor = document.getElementById("registros");
-        contenedor.innerHTML = "";
-        data.forEach(item => {
-          const div = document.createElement("div");
-          div.className = "card";
-          div.innerHTML = `<b>${item.ID || item.id} - ${item.Nombre}</b><br>${item.Descripcion || item.descripcion}`;
-          contenedor.appendChild(div);
-        });
-      } catch (err) {
-        console.error("Error cargando registros:", err);
-        document.getElementById("registros").innerHTML = `<p style="color: red;">Error al cargar: ${err.message}</p>`;
-      }
-    }
+  // 👉 Cargar publicaciones desde Google Sheets
+  async function cargarPublicaciones() {
+    const contenedor = document.getElementById("lista-publicaciones");
+    contenedor.innerHTML = "<p class='text-center text-gray-400'>Cargando publicaciones...</p>";
 
-    // Función de guardado mejorada y más robusta (POST)
-    document.getElementById("form").addEventListener("submit", async e => {
-      e.preventDefault();
-      
-      const botonGuardar = e.target.querySelector('button[type="submit"]');
-      botonGuardar.disabled = true; 
-      botonGuardar.textContent = "Guardando...";
+    try {
+      const response = await fetch(URL_SHEET);
+      if (!response.ok) throw new Error("No se pudo acceder a la hoja");
 
-      const body = {
-        Nombre: document.getElementById("nombre").value,
-        Descripcion: document.getElementById("descripcion").value
-      };
+      const csvText = await response.text();
+      const data = Papa.parse(csvText, { header: true }).data;
 
-      try {
-        const res = await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
+      contenedor.innerHTML = "";
 
-        if (!res.ok) {
-            throw new Error(`Error en la respuesta del servidor: ${res.status} ${res.statusText}`);
-        }
+      const publicacionesValidas = data.filter(p => p.titulo || p.contenido);
 
-        const respuestaAPI = await res.json();
-        console.log("Guardado exitoso:", respuestaAPI);
+      if (publicacionesValidas.length === 0) {
+        contenedor.innerHTML = "<p class='text-center text-gray-400'>No hay publicaciones todavía.</p>";
+        return;
+      }
 
-        e.target.reset();
-        cargarRegistros();
+      // Mostrar publicaciones (más recientes primero)
+      publicacionesValidas.reverse().forEach(pub => {
+        const titulo = pub.titulo || "Sin título";
+        const contenido = pub.contenido || "";
+        const imagen = pub.imagen ? pub.imagen.trim() : "";
+        const fecha = pub.fecha || "";
 
-      } catch (err) {
-        console.error("Error guardando:", err);
-        alert(`Hubo un error al guardar: ${err.message}. Revisa la consola para detalles.`);
-      } finally {
-        botonGuardar.disabled = false;
-        botonGuardar.textContent = "Guardar";
-      }
-    });
+        const card = document.createElement("div");
+        card.className = "p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm";
 
-    // Cargar al inicio
-    cargarRegistros();
-  </script>
+        card.innerHTML = `
+          <h3 class="font-semibold text-indigo-600 text-base">${titulo}</h3>
+          <p class="mt-1 whitespace-pre-line">${contenido}</p>
+          ${imagen ? `<img src="${imagen}" class="w-full mt-2 rounded-lg shadow-sm">` : ""}
+          <p class="text-xs text-gray-500 mt-2 text-right">${fecha}</p>
+        `;
+
+        contenedor.appendChild(card);
+      });
+
+    } catch (error) {
+      console.error(error);
+      contenedor.innerHTML = "<p class='text-center text-red-500'>Error al cargar publicaciones.</p>";
+    }
+  }
+
+  // Cargar al iniciar
+  document.addEventListener("DOMContentLoaded", cargarPublicaciones);
+  </script>
 </body>
 </html>
