@@ -2,146 +2,246 @@
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Iglesia - PWA Publicaciones</title>
-  <link rel="manifest" href="manifest.json" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="icon" href="icon.png" />
-  <style>
-    body {
-      font-family: system-ui, sans-serif;
-      background-color: #f3f4f6;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iglesia - PWA Publicaciones</title>
+    <link rel="manifest" href="manifest.json" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="icon.png" />
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            background-color: #f3f4f6;
+        }
 
-    .section-hidden {
-      display: none;
-    }
+        .section-hidden {
+            display: none;
+        }
 
-    .section-active {
-      display: block;
-    }
+        .section-active {
+            display: block;
+        }
 
-    .nav-btn.active svg,
-    .nav-btn.active span {
-      color: #4f46e5;
-      font-weight: 600;
-    }
-  </style>
+        .nav-btn.active svg,
+        .nav-btn.active span {
+            color: #4f46e5;
+            font-weight: 600;
+        }
+    </style>
 </head>
 
 <body class="flex flex-col min-h-screen">
-  <main class="flex-1 p-4">
-    <!-- 🏠 Sección principal -->
-    <div id="section-inicio" class="section-active bg-white p-4 rounded-xl shadow-md text-center">
-      <h1 class="text-xl font-semibold mb-2">Bienvenido 🙌</h1>
-      <p class="text-gray-600">Explora las publicaciones más recientes de la iglesia.</p>
-    </div>
+    <main class="flex-1 p-4">
+        <!-- 🏠 Sección principal -->
+        <div id="section-inicio" class="section-active bg-white p-4 rounded-xl shadow-md text-center">
+            <h1 class="text-xl font-semibold mb-2">Bienvenido 🙌</h1>
+            <p class="text-gray-600">Explora las publicaciones más recientes de la iglesia.</p>
+        </div>
 
-    <!-- 📰 Sección de Publicaciones -->
-    <div id="section-publicaciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="text-lg font-semibold">📰 Publicaciones</h2>
-        <button onclick="cargarPublicaciones()"
-          class="text-sm text-indigo-600 font-medium hover:underline flex items-center gap-1">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M4 4v6h6M20 20v-6h-6M4 20l16-16" />
-          </svg>
-          Actualizar
+        <!-- 📰 Sección de Publicaciones -->
+        <div id="section-publicaciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-lg font-semibold">📰 Publicaciones</h2>
+                <button onclick="cargarPublicaciones()"
+                    class="text-sm text-indigo-600 font-medium hover:underline flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v6h6M20 20v-6h-6M4 20l16-16" />
+                    </svg>
+                    Actualizar
+                </button>
+            </div>
+
+            <div id="lista-publicaciones" class="space-y-3 text-gray-700 text-sm">
+                <p class="text-center text-gray-400">Cargando publicaciones...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- 📱 Barra de navegación inferior -->
+    <nav class="bg-white shadow-inner flex justify-around p-2 border-t">
+        <button class="nav-btn flex flex-col items-center active" data-section="inicio">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h6m8-11v10a1 1 0 01-1 1h-6" />
+            </svg>
+            <span class="text-xs">Inicio</span>
         </button>
-      </div>
 
-      <div id="lista-publicaciones" class="space-y-3 text-gray-700 text-sm">
-        <p class="text-center text-gray-400">Cargando publicaciones...</p>
-      </div>
-    </div>
-  </main>
+        <button class="nav-btn flex flex-col items-center" data-section="publicaciones">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 11H5m14 0a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <span class="text-xs">Publicaciones</span>
+        </button>
+    </nav>
 
-  <!-- 📱 Barra de navegación inferior -->
-  <nav class="bg-white shadow-inner flex justify-around p-2 border-t">
-    <button class="nav-btn flex flex-col items-center active" data-section="inicio">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h6m8-11v10a1 1 0 01-1 1h-6" />
-      </svg>
-      <span class="text-xs">Inicio</span>
-    </button>
+    <!-- 📦 PapaParse -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
-    <button class="nav-btn flex flex-col items-center" data-section="publicaciones">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M19 11H5m14 0a7 7 0 11-14 0 7 7 0 0114 0z" />
-      </svg>
-      <span class="text-xs">Publicaciones</span>
-    </button>
-  </nav>
+    <script>
+        /***** CONFIG *****/
+        const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
 
-  <!-- 📦 PapaParse -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+        /***** NAV HANDLER *****/
+        document.querySelectorAll(".nav-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                const sectionId = "section-" + btn.dataset.section;
+                document.querySelectorAll("main > div").forEach(div => div.classList.add("section-hidden"));
+                const target = document.getElementById(sectionId);
+                if (target) {
+                    target.classList.remove("section-hidden");
+                    target.classList.add("section-active");
+                }
+            });
+        });
 
-<script>
-  const sheetUrl =
-    'https://opensheet.elk.sh/1d7Xxxxxxxx_tu_ID_DE_HOJAxxxxxxxx/Publicaciones'; // ← tu URL de hoja
+        /***** HELPERS *****/
+        function esImagen(url) {
+            return !!url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url);
+        }
 
-  // Función para convertir enlaces de Drive a vista directa
-  function getDriveImageUrl(url) {
-    if (!url) return '';
-    const match = url.match(/[-\w]{25,}/); // extrae el ID del enlace
-    return match ? `https://drive.google.com/uc?export=view&id=${match[0]}` : url;
-  }
+        function convertirEnlaceYouTube(url) {
+            if (!url) return null;
+            url = String(url).trim();
+            // embed directo
+            let m = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/i);
+            if (m) return `https://www.youtube.com/embed/${m[1]}`;
+            // watch?v=
+            m = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/i);
+            if (m) return `https://www.youtube.com/embed/${m[1]}`;
+            // youtu.be short link
+            m = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/i);
+            if (m) return `https://www.youtube.com/embed/${m[1]}`;
+            // shorts
+            m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/i);
+            if (m) return `https://www.youtube.com/embed/${m[1]}`;
+            // fallback: id at end
+            m = url.match(/([a-zA-Z0-9_-]{11})$/);
+            if (m) return `https://www.youtube.com/embed/${m[1]}`;
+            return null;
+        }
 
-  // Cargar publicaciones
-  fetch(sheetUrl)
-    .then(response => response.json())
-    .then(data => {
-      const container = document.getElementById('posts');
-      container.innerHTML = '';
+        /***** LOAD PUBLICATIONS *****/
+        async function cargarPublicaciones() {
+            const contenedor = document.getElementById("lista-publicaciones");
+            contenedor.innerHTML = "<p class='text-center text-gray-400'>Cargando publicaciones...</p>";
 
-      data.reverse().forEach(row => {
-        const titulo = row['Título'] || row['titulo'] || '';
-        const contenido = row['Contenido'] || row['contenido'] || '';
-        const imagen = getDriveImageUrl(row['Imagen'] || row['imagen']);
-        const video = row['Video'] || row['video'];
-        const fecha = row['Fecha'] || row['fecha'] || '';
+            try {
+                const response = await fetch(URL_SHEET);
+                if (!response.ok) throw new Error("No se pudo acceder a la hoja");
 
-        // Crear card
-        const card = document.createElement('div');
-        card.className =
-          'bg-white rounded-xl shadow p-4 mb-6 transition hover:shadow-lg';
+                const csvText = await response.text();
+                const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
 
-        card.innerHTML = `
-          <h2 class="text-xl font-semibold mb-2">${titulo}</h2>
-          <p class="text-gray-700 mb-3">${contenido}</p>
-          ${
-            imagen
-              ? `<img src="${imagen}" alt="${titulo}" class="w-full rounded-lg shadow mb-3" />`
-              : ''
-          }
-          ${
-            video
-              ? `<div class="mt-4">
-                  <iframe class="w-full h-52 rounded-lg shadow"
-                    src="${video}"
-                    title="${titulo}"
-                    frameborder="0"
-                    allowfullscreen>
-                  </iframe>
-                </div>`
-              : ''
-          }
-          <p class="text-sm text-gray-500 mt-2">${fecha}</p>
-        `;
+                contenedor.innerHTML = "";
 
-        container.appendChild(card);
-      });
-    })
-    .catch(error => {
-      console.error('Error al cargar los datos:', error);
-      document.getElementById('posts').innerHTML =
-        '<p class="text-red-500">Error al cargar publicaciones.</p>';
-    });
-</script>
+                if (!parsed || parsed.length === 0) {
+                    contenedor.innerHTML = "<p class='text-center text-gray-400'>No hay publicaciones todavía.</p>";
+                    return;
+                }
+
+                // Mostrar más recientes primero
+                parsed.reverse().forEach(rawRow => {
+                    // Normalizar claves (minúsculas) y valores
+                    const row = {};
+                    Object.keys(rawRow).forEach(k => {
+                        const key = k ? k.trim().toLowerCase() : "";
+                        row[key] = rawRow[k] ? String(rawRow[k]).trim() : "";
+                    });
+
+                    // Requerir al menos título o contenido
+                    if (!row.titulo && !row.contenido) return;
+
+                    // Crear tarjeta
+                    const card = document.createElement("div");
+                    card.className = "p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm";
+
+                    // Título
+                    const h3 = document.createElement("h3");
+                    h3.className = "font-semibold text-indigo-600 text-base";
+                    h3.textContent = row.titulo || "Sin título";
+                    card.appendChild(h3);
+
+                    // Fecha
+                    if (row.fecha) {
+                        const f = document.createElement("p");
+                        f.className = "text-xs text-gray-500 mt-2 text-left";
+                        f.textContent = row.fecha;
+                        card.appendChild(f);
+                    }
+                    
+                    // IMAGEN (si existe) - mostramos siempre si hay
+                    if (row.imagen) {
+                        // si en la celda imagen hay un youtubelink, lo convertimos a embed y mostramos como video
+                        const posibleVideoDesdeImagen = convertirEnlaceYouTube(row.imagen);
+                        if (posibleVideoDesdeImagen) {
+                            const vidDiv = document.createElement("div");
+                            vidDiv.className = "mt-4";
+                            vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${posibleVideoDesdeImagen}" title="${row.titulo || 'Video'}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
+                            card.appendChild(vidDiv);
+                        } else if (esImagen(row.imagen)) {
+                            const img = document.createElement("img");
+                            img.src = row.imagen;
+                            img.alt = row.titulo || "Imagen";
+                            img.className = "w-full mt-2 rounded-lg shadow-sm";
+                            img.loading = "lazy";
+                            card.appendChild(img);
+                        } else {
+                            // si no es ni imagen ni video reconocible, mostrar link
+                            const a = document.createElement("a");
+                            a.href = row.imagen;
+                            a.target = "_blank";
+                            a.rel = "noopener";
+                            a.className = "text-blue-600 underline block mt-2 break-words";
+                            a.textContent = row.imagen;
+                            card.appendChild(a);
+                        }
+                    }
+
+                    // VIDEO (columna video) - si existe, lo mostramos *además* (debajo)
+                    if (row.video) {
+                        const videoEmbed = convertirEnlaceYouTube(row.video);
+                        if (videoEmbed) {
+                            const vidDiv = document.createElement("div");
+                            vidDiv.className = "mt-4";
+                            vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${videoEmbed}" title="${row.titulo || 'Video'}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
+                            card.appendChild(vidDiv);
+                        } else {
+                            // si no es YouTube pero es un iframe embed directo (o otra url), intentar mostrar como iframe seguro
+                            const vidDiv = document.createElement("div");
+                            vidDiv.className = "mt-4";
+                            vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${row.video}" title="${row.titulo || 'Video'}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
+                            card.appendChild(vidDiv);
+                        }
+                    }
+
+                    // Contenido
+                    if (row.contenido) {
+                        const p = document.createElement("p");
+                        p.className = "mt-1 whitespace-pre-line text-gray-700";
+                        p.textContent = row.contenido;
+                        card.appendChild(p);
+                    }
+
+                    contenedor.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error(err);
+                contenedor.innerHTML = "<p class='text-center text-red-500'>Error al cargar publicaciones.</p>";
+            }
+        }
+
+        // Cargar al iniciar
+        document.addEventListener("DOMContentLoaded", cargarPublicaciones);
+    </script>
 </body>
 
 </html>
