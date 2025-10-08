@@ -128,116 +128,120 @@
             return null;
         }
 
-        /***** LOAD PUBLICATIONS *****/
-        async function cargarPublicaciones() {
-            const contenedor = document.getElementById("lista-publicaciones");
-            contenedor.innerHTML = "<p class='text-center text-gray-400'>Cargando publicaciones...</p>";
+       /***** LOAD PUBLICATIONS *****/
+async function cargarPublicaciones() {
+  const contenedor = document.getElementById("lista-publicaciones");
+  contenedor.innerHTML =
+    "<p class='text-center text-gray-400'>Cargando publicaciones...</p>";
 
-            try {
-                const response = await fetch(URL_SHEET);
-                if (!response.ok) throw new Error("No se pudo acceder a la hoja");
+  // 🔹 Convierte enlaces de Drive a formato visible
+  function getDriveImageUrl(url) {
+    if (!url) return "";
+    const match = url.match(/[-\w]{25,}/); // extrae el ID
+    return match ? `https://drive.google.com/uc?export=view&id=${match[0]}` : url;
+  }
 
-                const csvText = await response.text();
-                const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
+  try {
+    const response = await fetch(URL_SHEET);
+    if (!response.ok) throw new Error("No se pudo acceder a la hoja");
 
-                contenedor.innerHTML = "";
+    const csvText = await response.text();
+    const parsed = Papa.parse(csvText, {
+      header: true,
+      skipEmptyLines: true,
+    }).data;
 
-                if (!parsed || parsed.length === 0) {
-                    contenedor.innerHTML = "<p class='text-center text-gray-400'>No hay publicaciones todavía.</p>";
-                    return;
-                }
+    contenedor.innerHTML = "";
 
-                // Mostrar más recientes primero
-                parsed.reverse().forEach(rawRow => {
-                    // Normalizar claves (minúsculas) y valores
-                    const row = {};
-                    Object.keys(rawRow).forEach(k => {
-                        const key = k ? k.trim().toLowerCase() : "";
-                        row[key] = rawRow[k] ? String(rawRow[k]).trim() : "";
-                    });
+    if (!parsed || parsed.length === 0) {
+      contenedor.innerHTML =
+        "<p class='text-center text-gray-400'>No hay publicaciones todavía.</p>";
+      return;
+    }
 
-                    // Requerir al menos título o contenido
-                    if (!row.titulo && !row.contenido) return;
+    parsed.reverse().forEach((rawRow) => {
+      const row = {};
+      Object.keys(rawRow).forEach((k) => {
+        const key = k ? k.trim().toLowerCase() : "";
+        row[key] = rawRow[k] ? String(rawRow[k]).trim() : "";
+      });
 
-                    // Crear tarjeta
-                    const card = document.createElement("div");
-                    card.className = "p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm";
+      if (!row.titulo && !row.contenido) return;
 
-                    // Título
-                    const h3 = document.createElement("h3");
-                    h3.className = "font-semibold text-indigo-600 text-base";
-                    h3.textContent = row.titulo || "Sin título";
-                    card.appendChild(h3);
+      const card = document.createElement("div");
+      card.className =
+        "p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm";
 
-                    // Fecha
-                    if (row.fecha) {
-                        const f = document.createElement("p");
-                        f.className = "text-xs text-gray-500 mt-2 text-left";
-                        f.textContent = row.fecha;
-                        card.appendChild(f);
-                    }
-                    
-                    // IMAGEN (si existe) - mostramos siempre si hay
-                    if (row.imagen) {
-                        // si en la celda imagen hay un youtubelink, lo convertimos a embed y mostramos como video
-                        const posibleVideoDesdeImagen = convertirEnlaceYouTube(row.imagen);
-                        if (posibleVideoDesdeImagen) {
-                            const vidDiv = document.createElement("div");
-                            vidDiv.className = "mt-4";
-                            vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${posibleVideoDesdeImagen}" title="${row.titulo || 'Video'}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
-                            card.appendChild(vidDiv);
-                        } else if (esImagen(row.imagen)) {
-                            const img = document.createElement("img");
-                            img.src = row.imagen;
-                            img.alt = row.titulo || "Imagen";
-                            img.className = "w-full mt-2 rounded-lg shadow-sm";
-                            img.loading = "lazy";
-                            card.appendChild(img);
-                        } else {
-                            // si no es ni imagen ni video reconocible, mostrar link
-                            const a = document.createElement("a");
-                            a.href = row.imagen;
-                            a.target = "_blank";
-                            a.rel = "noopener";
-                            a.className = "text-blue-600 underline block mt-2 break-words";
-                            a.textContent = row.imagen;
-                            card.appendChild(a);
-                        }
-                    }
+      const h3 = document.createElement("h3");
+      h3.className = "font-semibold text-indigo-600 text-base";
+      h3.textContent = row.titulo || "Sin título";
+      card.appendChild(h3);
 
-                    // VIDEO (columna video) - si existe, lo mostramos *además* (debajo)
-                    if (row.video) {
-                        const videoEmbed = convertirEnlaceYouTube(row.video);
-                        if (videoEmbed) {
-                            const vidDiv = document.createElement("div");
-                            vidDiv.className = "mt-4";
-                            vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${videoEmbed}" title="${row.titulo || 'Video'}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
-                            card.appendChild(vidDiv);
-                        } else {
-                            // si no es YouTube pero es un iframe embed directo (o otra url), intentar mostrar como iframe seguro
-                            const vidDiv = document.createElement("div");
-                            vidDiv.className = "mt-4";
-                            vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${row.video}" title="${row.titulo || 'Video'}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
-                            card.appendChild(vidDiv);
-                        }
-                    }
+      if (row.fecha) {
+        const f = document.createElement("p");
+        f.className = "text-xs text-gray-500 mt-2 text-left";
+        f.textContent = row.fecha;
+        card.appendChild(f);
+      }
 
-                    // Contenido
-                    if (row.contenido) {
-                        const p = document.createElement("p");
-                        p.className = "mt-1 whitespace-pre-line text-gray-700";
-                        p.textContent = row.contenido;
-                        card.appendChild(p);
-                    }
-
-                    contenedor.appendChild(card);
-                });
-
-            } catch (err) {
-                console.error(err);
-                contenedor.innerHTML = "<p class='text-center text-red-500'>Error al cargar publicaciones.</p>";
-            }
+      // ✅ IMAGEN (Drive o normal)
+      if (row.imagen) {
+        const imgUrl = getDriveImageUrl(row.imagen);
+        const posibleVideoDesdeImagen = convertirEnlaceYouTube(imgUrl);
+        if (posibleVideoDesdeImagen) {
+          const vidDiv = document.createElement("div");
+          vidDiv.className = "mt-4";
+          vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${posibleVideoDesdeImagen}" title="${row.titulo || 'Video'}" frameborder="0" allowfullscreen loading="lazy"></iframe>`;
+          card.appendChild(vidDiv);
+        } else if (esImagen(imgUrl)) {
+          const img = document.createElement("img");
+          img.src = imgUrl;
+          img.alt = row.titulo || "Imagen";
+          img.className = "w-full mt-2 rounded-lg shadow-sm";
+          img.loading = "lazy";
+          card.appendChild(img);
+        } else {
+          const a = document.createElement("a");
+          a.href = imgUrl;
+          a.target = "_blank";
+          a.rel = "noopener";
+          a.className = "text-blue-600 underline block mt-2 break-words";
+          a.textContent = imgUrl;
+          card.appendChild(a);
         }
+      }
+
+      // VIDEO (columna "video")
+      if (row.video) {
+        const videoEmbed = convertirEnlaceYouTube(row.video);
+        if (videoEmbed) {
+          const vidDiv = document.createElement("div");
+          vidDiv.className = "mt-4";
+          vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${videoEmbed}" title="${row.titulo || 'Video'}" frameborder="0" allowfullscreen loading="lazy"></iframe>`;
+          card.appendChild(vidDiv);
+        } else {
+          const vidDiv = document.createElement("div");
+          vidDiv.className = "mt-4";
+          vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${row.video}" title="${row.titulo || 'Video'}" frameborder="0" allowfullscreen loading="lazy"></iframe>`;
+          card.appendChild(vidDiv);
+        }
+      }
+
+      if (row.contenido) {
+        const p = document.createElement("p");
+        p.className = "mt-1 whitespace-pre-line text-gray-700";
+        p.textContent = row.contenido;
+        card.appendChild(p);
+      }
+
+      contenedor.appendChild(card);
+    });
+  } catch (err) {
+    console.error(err);
+    contenedor.innerHTML =
+      "<p class='text-center text-red-500'>Error al cargar publicaciones.</p>";
+  }
+}
 
         // Cargar al iniciar
         document.addEventListener("DOMContentLoaded", cargarPublicaciones);
