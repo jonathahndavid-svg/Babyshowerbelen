@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
+<head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Iglesia - PWA Publicaciones</title>
@@ -25,6 +25,7 @@
     }
   </style>
 </head>
+
 <body class="flex flex-col min-h-screen">
   <main class="flex-1 p-4">
     <!-- 🏠 Sección principal -->
@@ -67,14 +68,13 @@
     </button>
   </nav>
 
-  <!-- 📦 Librería PapaParse -->
+  <!-- 📦 PapaParse -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
   <script>
-  // 👉 URL de tu hoja de Google Sheets (CSV)
   const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
 
-  // 👉 Cambiar secciones de navegación
+  // 🔹 Cambiar entre secciones
   document.querySelectorAll(".nav-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
@@ -86,7 +86,29 @@
     });
   });
 
-  // 👉 Cargar publicaciones desde Google Sheets
+  // 🔹 Detectar si el enlace es imagen
+  function esImagen(url) {
+    return /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url);
+  }
+
+  // 🔹 Convertir cualquier formato de YouTube a embed
+  function convertirEnlaceYouTube(url) {
+    if (!url) return null;
+    url = url.trim();
+    let m = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/i);
+    if (m) return `https://www.youtube.com/embed/${m[1]}`;
+    m = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/i);
+    if (m) return `https://www.youtube.com/embed/${m[1]}`;
+    m = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/i);
+    if (m) return `https://www.youtube.com/embed/${m[1]}`;
+    m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/i);
+    if (m) return `https://www.youtube.com/embed/${m[1]}`;
+    m = url.match(/([a-zA-Z0-9_-]{11})$/);
+    if (m) return `https://www.youtube.com/embed/${m[1]}`;
+    return null;
+  }
+
+  // 🔹 Cargar publicaciones desde Google Sheets
   async function cargarPublicaciones() {
     const contenedor = document.getElementById("lista-publicaciones");
     contenedor.innerHTML = "<p class='text-center text-gray-400'>Cargando publicaciones...</p>";
@@ -96,34 +118,53 @@
       if (!response.ok) throw new Error("No se pudo acceder a la hoja");
 
       const csvText = await response.text();
-      const data = Papa.parse(csvText, { header: true }).data;
-
+      const data = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
       contenedor.innerHTML = "";
 
-      const publicacionesValidas = data.filter(p => p.titulo || p.contenido);
-
-      if (publicacionesValidas.length === 0) {
+      if (!data || data.length === 0) {
         contenedor.innerHTML = "<p class='text-center text-gray-400'>No hay publicaciones todavía.</p>";
         return;
       }
 
-      // Mostrar publicaciones (más recientes primero)
-      publicacionesValidas.reverse().forEach(pub => {
-        const titulo = pub.titulo || "Sin título";
-        const contenido = pub.contenido || "";
-        const imagen = pub.imagen ? pub.imagen.trim() : "";
-        const fecha = pub.fecha || "";
+      data.reverse().forEach(row => {
+        const titulo = row.titulo?.trim() || "Sin título";
+        const contenido = row.contenido?.trim() || "";
+        const imagen = row.imagen?.trim() || "";
+        const video = row.video?.trim() || "";
+        const fecha = row.fecha?.trim() || "";
 
         const card = document.createElement("div");
         card.className = "p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm";
 
-        card.innerHTML = `
-          <h3 class="font-semibold text-indigo-600 text-base">${titulo}</h3>
-          <p class="mt-1 whitespace-pre-line">${contenido}</p>
-          ${imagen ? `<img src="${imagen}" class="w-full mt-2 rounded-lg shadow-sm">` : ""}
-          <p class="text-xs text-gray-500 mt-2 text-right">${fecha}</p>
-        `;
+        // Título
+        card.innerHTML = `<h3 class="font-semibold text-indigo-600 text-base">${titulo}</h3>`;
 
+        // Contenido
+        if (contenido) {
+          card.innerHTML += `<p class="mt-1 whitespace-pre-line">${contenido}</p>`;
+        }
+
+        // Mostrar video o imagen según corresponda
+        let mediaHTML = "";
+        if (video) {
+          const videoEmbed = convertirEnlaceYouTube(video);
+          if (videoEmbed) {
+            mediaHTML = `
+              <div class="mt-4">
+                <iframe class="w-full h-52 rounded-lg shadow"
+                  src="${videoEmbed}"
+                  title="${titulo}"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen></iframe>
+              </div>`;
+          }
+        } else if (imagen && esImagen(imagen)) {
+          mediaHTML = `<img src="${imagen}" class="w-full mt-2 rounded-lg shadow-sm" alt="${titulo}">`;
+        }
+
+        card.innerHTML += mediaHTML;
+        if (fecha) card.innerHTML += `<p class="text-xs text-gray-500 mt-2 text-right">${fecha}</p>`;
         contenedor.appendChild(card);
       });
 
@@ -135,157 +176,6 @@
 
   // Cargar al iniciar
   document.addEventListener("DOMContentLoaded", cargarPublicaciones);
-
- </script>
-  <!-- PapaParse (si no lo tienes ya) -->
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
-<script>
-const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
-
-// Convierte varios formatos de YouTube a embed
-function convertirEnlaceYouTube(url) {
-  if (!url) return null;
-  url = url.trim();
-  // embed directo
-  let m = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/i);
-  if (m) return `https://www.youtube.com/embed/${m[1]}`;
-  // watch?v=
-  m = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/i);
-  if (m) return `https://www.youtube.com/embed/${m[1]}`;
-  // youtu.be short link
-  m = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/i);
-  if (m) return `https://www.youtube.com/embed/${m[1]}`;
-  // shorts
-  m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/i);
-  if (m) return `https://www.youtube.com/embed/${m[1]}`;
-  // fallback: buscar un id de 11 chars al final
-  m = url.match(/([a-zA-Z0-9_-]{11})$/);
-  if (m) return `https://www.youtube.com/embed/${m[1]}`;
-  return null;
-}
-
-function esImagen(url) {
-  return /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url);
-}
-
-async function cargarPublicaciones() {
-  const contenedor = document.getElementById('publicaciones') || document.getElementById('lista-publicaciones');
-  if (!contenedor) {
-    console.error('No se encontró contenedor #publicaciones ni #lista-publicaciones');
-    return;
-  }
-  contenedor.innerHTML = '<p class="text-center text-gray-400">Cargando publicaciones...</p>';
-
-  try {
-    const res = await fetch(URL_SHEET);
-    if (!res.ok) throw new Error('No se pudo acceder a la hoja (fetch falló)');
-
-    const csv = await res.text();
-    const parsed = Papa.parse(csv, { header: true, skipEmptyLines: true }).data;
-    contenedor.innerHTML = '';
-
-    if (!parsed || parsed.length === 0) {
-      contenedor.innerHTML = '<p class="text-center text-gray-400">No hay publicaciones.</p>';
-      return;
-    }
-
-    // Mostrar más recientes primero
-    parsed.reverse().forEach(rawRow => {
-      // Normalizar claves a minúsculas y trim valores
-      const row = {};
-      Object.keys(rawRow).forEach(k => {
-        const key = k ? k.trim().toLowerCase() : '';
-        row[key] = rawRow[k] ? String(rawRow[k]).trim() : '';
-      });
-
-      // Campos esperados: titulo, contenido, imagen, video, fecha
-      if (!row.titulo && !row.contenido) return; // ignorar filas vacías
-
-      const card = document.createElement('div');
-      card.className = 'p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm mb-3';
-
-      const h = document.createElement('h3');
-      h.className = 'font-semibold text-indigo-600 text-base';
-      h.textContent = row.titulo || 'Sin título';
-      card.appendChild(h);
-
-      if (row.contenido) {
-        const p = document.createElement('p');
-        p.className = 'mt-1 whitespace-pre-line text-gray-700';
-        p.textContent = row.contenido;
-        card.appendChild(p);
-      }
-
-      // Prioriza columna `video`; si no existe, revisa `imagen`
-      let mediaMostrada = false;
-
-      if (row.video) {
-        const vid = convertirEnlaceYouTube(row.video);
-        if (vid) {
-          const div = document.createElement('div');
-          div.className = 'mt-4';
-          div.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow"
-            src="${vid}"
-            title="${row.titulo || 'Video'}"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen></iframe>`;
-          card.appendChild(div);
-          mediaMostrada = true;
-        }
-      }
-
-      // Si no mostró video, evaluar imagen (o si en imagen hay un video link)
-      if (!mediaMostrada && row.imagen) {
-        const posibleVid = convertirEnlaceYouTube(row.imagen);
-        if (posibleVid) {
-          const div = document.createElement('div');
-          div.className = 'mt-4';
-          div.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow"
-            src="${posibleVid}"
-            title="${row.titulo || 'Video'}"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen></iframe>`;
-          card.appendChild(div);
-          mediaMostrada = true;
-        } else if (esImagen(row.imagen)) {
-          const img = document.createElement('img');
-          img.src = row.imagen;
-          img.alt = row.titulo || 'Imagen';
-          img.className = 'w-full mt-2 rounded-lg shadow-sm';
-          card.appendChild(img);
-          mediaMostrada = true;
-        } else {
-          // no es imagen ni video conocido -> mostrar como link
-          const a = document.createElement('a');
-          a.href = row.imagen;
-          a.target = '_blank';
-          a.rel = 'noopener';
-          a.className = 'text-blue-600 underline block mt-2 break-words';
-          a.textContent = row.imagen;
-          card.appendChild(a);
-        }
-      }
-
-      if (row.fecha) {
-        const f = document.createElement('p');
-        f.className = 'text-xs text-gray-500 mt-2 text-right';
-        f.textContent = row.fecha;
-        card.appendChild(f);
-      }
-
-      contenedor.appendChild(card);
-    });
-
-  } catch (err) {
-    console.error(err);
-    contenedor.innerHTML = '<p class="text-center text-red-500">Error al cargar publicaciones.</p>';
-  }
-}
-
-document.addEventListener('DOMContentLoaded', cargarPublicaciones);
-</script>
+  </script>
 </body>
 </html>
