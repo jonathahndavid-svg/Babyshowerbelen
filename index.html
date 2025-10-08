@@ -80,147 +80,68 @@
   <!-- 📦 PapaParse -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
-  <script>
-    /***** CONFIG *****/
-    const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
+<script>
+  const sheetUrl =
+    'https://opensheet.elk.sh/1d7Xxxxxxxx_tu_ID_DE_HOJAxxxxxxxx/Publicaciones'; // ← tu URL de hoja
 
-    /***** NAV HANDLER *****/
-    document.querySelectorAll(".nav-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        const sectionId = "section-" + btn.dataset.section;
-        document.querySelectorAll("main > div").forEach(div => div.classList.add("section-hidden"));
-        const target = document.getElementById(sectionId);
-        if (target) {
-          target.classList.remove("section-hidden");
-          target.classList.add("section-active");
-        }
+  // Función para convertir enlaces de Drive a vista directa
+  function getDriveImageUrl(url) {
+    if (!url) return '';
+    const match = url.match(/[-\w]{25,}/); // extrae el ID del enlace
+    return match ? `https://drive.google.com/uc?export=view&id=${match[0]}` : url;
+  }
+
+  // Cargar publicaciones
+  fetch(sheetUrl)
+    .then(response => response.json())
+    .then(data => {
+      const container = document.getElementById('posts');
+      container.innerHTML = '';
+
+      data.reverse().forEach(row => {
+        const titulo = row['Título'] || row['titulo'] || '';
+        const contenido = row['Contenido'] || row['contenido'] || '';
+        const imagen = getDriveImageUrl(row['Imagen'] || row['imagen']);
+        const video = row['Video'] || row['video'];
+        const fecha = row['Fecha'] || row['fecha'] || '';
+
+        // Crear card
+        const card = document.createElement('div');
+        card.className =
+          'bg-white rounded-xl shadow p-4 mb-6 transition hover:shadow-lg';
+
+        card.innerHTML = `
+          <h2 class="text-xl font-semibold mb-2">${titulo}</h2>
+          <p class="text-gray-700 mb-3">${contenido}</p>
+          ${
+            imagen
+              ? `<img src="${imagen}" alt="${titulo}" class="w-full rounded-lg shadow mb-3" />`
+              : ''
+          }
+          ${
+            video
+              ? `<div class="mt-4">
+                  <iframe class="w-full h-52 rounded-lg shadow"
+                    src="${video}"
+                    title="${titulo}"
+                    frameborder="0"
+                    allowfullscreen>
+                  </iframe>
+                </div>`
+              : ''
+          }
+          <p class="text-sm text-gray-500 mt-2">${fecha}</p>
+        `;
+
+        container.appendChild(card);
       });
+    })
+    .catch(error => {
+      console.error('Error al cargar los datos:', error);
+      document.getElementById('posts').innerHTML =
+        '<p class="text-red-500">Error al cargar publicaciones.</p>';
     });
-
-    /***** HELPERS *****/
-    function esImagen(url) {
-      return !!url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url);
-    }
-
-    // 🔹 Convertir enlaces de Drive a imágenes directas
-    function convertirEnlaceDrive(url) {
-      if (!url) return "";
-      url = url.trim();
-      const match = url.match(/(?:id=|\/d\/)([a-zA-Z0-9_-]+)/);
-      if (match && match[1]) {
-        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-      }
-      return url;
-    }
-
-    function convertirEnlaceYouTube(url) {
-      if (!url) return null;
-      url = String(url).trim();
-      let m = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/i);
-      if (m) return `https://www.youtube.com/embed/${m[1]}`;
-      m = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/i);
-      if (m) return `https://www.youtube.com/embed/${m[1]}`;
-      m = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/i);
-      if (m) return `https://www.youtube.com/embed/${m[1]}`;
-      m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/i);
-      if (m) return `https://www.youtube.com/embed/${m[1]}`;
-      m = url.match(/([a-zA-Z0-9_-]{11})$/);
-      if (m) return `https://www.youtube.com/embed/${m[1]}`;
-      return null;
-    }
-
-    /***** LOAD PUBLICATIONS *****/
-    async function cargarPublicaciones() {
-      const contenedor = document.getElementById("lista-publicaciones");
-      contenedor.innerHTML = "<p class='text-center text-gray-400'>Cargando publicaciones...</p>";
-
-      try {
-        const response = await fetch(URL_SHEET);
-        if (!response.ok) throw new Error("No se pudo acceder a la hoja");
-
-        const csvText = await response.text();
-        const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
-        contenedor.innerHTML = "";
-
-        if (!parsed || parsed.length === 0) {
-          contenedor.innerHTML = "<p class='text-center text-gray-400'>No hay publicaciones todavía.</p>";
-          return;
-        }
-
-        parsed.reverse().forEach(rawRow => {
-          const row = {};
-          Object.keys(rawRow).forEach(k => {
-            const key = k ? k.trim().toLowerCase() : "";
-            row[key] = rawRow[k] ? String(rawRow[k]).trim() : "";
-          });
-
-          if (!row.titulo && !row.contenido) return;
-
-          const card = document.createElement("div");
-          card.className = "p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm";
-
-          const h3 = document.createElement("h3");
-          h3.className = "font-semibold text-indigo-600 text-base";
-          h3.textContent = row.titulo || "Sin título";
-          card.appendChild(h3);
-
-          if (row.fecha) {
-            const f = document.createElement("p");
-            f.className = "text-xs text-gray-500 mt-2 text-left";
-            f.textContent = row.fecha;
-            card.appendChild(f);
-          }
-
-          // 🖼️ Imagen
-          if (row.imagen) {
-            const driveUrl = convertirEnlaceDrive(row.imagen);
-            const posibleVideo = convertirEnlaceYouTube(driveUrl);
-            if (posibleVideo) {
-              const vidDiv = document.createElement("div");
-              vidDiv.className = "mt-4";
-              vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${posibleVideo}" title="${row.titulo || 'Video'}" frameborder="0" allowfullscreen></iframe>`;
-              card.appendChild(vidDiv);
-            } else {
-              const img = document.createElement("img");
-              img.src = driveUrl;
-              img.alt = row.titulo || "Imagen";
-              img.className = "w-full mt-2 rounded-lg shadow-sm";
-              img.loading = "lazy";
-              img.onerror = () => { img.style.display = "none"; };
-              card.appendChild(img);
-            }
-          }
-
-          // 🎬 Video
-          if (row.video) {
-            const videoEmbed = convertirEnlaceYouTube(row.video);
-            if (videoEmbed) {
-              const vidDiv = document.createElement("div");
-              vidDiv.className = "mt-4";
-              vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${videoEmbed}" title="${row.titulo || 'Video'}" frameborder="0" allowfullscreen></iframe>`;
-              card.appendChild(vidDiv);
-            }
-          }
-
-          if (row.contenido) {
-            const p = document.createElement("p");
-            p.className = "mt-1 whitespace-pre-line text-gray-700";
-            p.textContent = row.contenido;
-            card.appendChild(p);
-          }
-
-          contenedor.appendChild(card);
-        });
-      } catch (err) {
-        console.error(err);
-        contenedor.innerHTML = "<p class='text-center text-red-500'>Error al cargar publicaciones.</p>";
-      }
-    }
-
-    document.addEventListener("DOMContentLoaded", cargarPublicaciones);
-  </script>
+</script>
 </body>
 
 </html>
