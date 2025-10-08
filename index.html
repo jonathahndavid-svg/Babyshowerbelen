@@ -1,320 +1,330 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Soy IBA</title>
-  <link rel="manifest" href="manifest.json" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="icon" href="icon.png" />
-  <style>
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-      background: radial-gradient(circle at 20% 20%, #e5d9f2, transparent 30%),
-        radial-gradient(circle at 80% 25%, #d0e1fa, transparent 30%),
-        radial-gradient(circle at 40% 80%, #c8f6f9, transparent 30%),
-        radial-gradient(circle at 70% 90%, #ffe6e6, transparent 30%),
-        #f3f7fb;
-      background-attachment: fixed;
-      display: flex;
-      flex-direction: column;
-      color: rgb(100, 109, 174);
-    }
-
-    .section-hidden {
-      display: none;
-    }
-
-    .section-active {
-      display: block;
-    }
-
-    .nav-btn.active svg,
-    .nav-btn.active span {
-      color: #4f46e5;
-      font-weight: 600;
-    }
-
-    .iframe-container {
-      position: relative;
-      width: 100%;
-      padding-bottom: 56.25%; /* 16:9 */
-      height: 0;
-      overflow: hidden;
-      border-radius: 12px;
-    }
-
-    .iframe-container iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
-  </style>
-</head>
-
-<body class="flex flex-col min-h-screen">
-  <!-- Header -->
-  <header class="flex items-center justify-between p-4 bg-white shadow-md">
-    <div class="flex items-center space-x-2">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24"
-        stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-      </svg>
-      <span class="font-semibold">Iglesia Bíblica Antioquía</span>
-    </div>
-    <button id="menuBtn" class="p-2 rounded hover:bg-indigo-100">☰</button>
-  </header>
-
-  <!-- Sidebar -->
-  <aside id="sidebar"
-    class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50 overflow-y-auto">
-    <div class="flex justify-end p-2">
-      <button id="closeSidebar" class="p-2 text-gray-600 hover:text-red-500">✕</button>
-    </div>
-    <div class="p-4 space-y-4">
-      <h2 class="text-lg font-bold">Misión</h2>
-      <p>Proclamar el evangelio y discipular con amor.</p>
-      <h2 class="text-lg font-bold">Visión</h2>
-      <p>Ser una iglesia centrada en Cristo.</p>
-      <h2 class="text-lg font-bold">Lo que creemos</h2>
-      <p>Basados en la Biblia como Palabra de Dios.</p>
-      <h2 class="text-lg font-bold">Horarios</h2>
-      <ul class="list-disc pl-5">
-        <li>Domingo 8:00 y 10:00 AM</li>
-        <li>Jueves 08:00 AM Ayuno / 07:00 PM Estudio bíblico</li>
-        <li>Sábado 04:00 PM Pre Juveniles / 06:00 PM Jóvenes</li>
-        <li>Último martes 07:00 PM Oración</li>
-      </ul>
-      <h2 class="text-lg font-bold">Recomendados</h2>
-      <p>Lecturas y música edificante.</p>
-      <h2 class="text-lg font-bold">Contacto</h2>
-      <p>Calle 38asur #38-34, Envigado<br>info@iglesiaiba.org</p>
-    </div>
-  </aside>
-
-  <!-- Contenido -->
-  <main id="content" class="flex-1 overflow-y-auto p-4 pb-20 relative space-y-2">
-    <!-- Transmisión -->
-    <div id="section-transmision" class="bg-white p-4 rounded-xl shadow-md space-y-3">
-      <h2 class="text-lg font-semibold text-center">🎥 Transmisión del domingo anterior</h2>
-
-      <!-- YouTube -->
-      <div class="iframe-container">
-        <iframe
-          src="https://www.youtube.com/embed/live_stream?channel=UC2nMuRVJMdGW-M_CkogPe3Q"
-          title="Transmisión YouTube"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen></iframe>
-      </div>
-
-      <!-- Spotify -->
-      <div class="iframe-container mt-4">
-        <iframe style="border-radius:12px"
-          src="https://open.spotify.com/embed/episode/SPOTIFY_ID?utm_source=generator"
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          loading="lazy"></iframe>
-      </div>
-    </div>
-
-    <!-- Publicaciones -->
-    <div id="section-publicaciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">
-      <h2 class="text-lg font-semibold text-center mb-3">📰 Publicaciones</h2>
-      <div id="lista-publicaciones" class="space-y-3 text-gray-700 text-sm">
-        <p class="text-center text-gray-400">Cargando publicaciones...</p>
-      </div>
-    </div>
-
-    <!-- Otras secciones -->
-    <div id="section-inscripciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">📝 Inscripciones y anuncios
-    </div>
-    <div id="section-donaciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">💳 Donaciones: <br> QR +
-      Nº Cuenta
-    </div>
-    <div id="section-eco" class="section-hidden bg-white p-4 rounded-xl shadow-md">🌍 Grupos ECO: mapa o links</div>
-    <div id="section-recomendados" class="section-hidden bg-white p-4 rounded-xl shadow-md">⭐ Recomendados</div>
-  </main>
-
-  <!-- Barra inferior -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-inner flex justify-around py-2">
-    <button class="nav-btn active flex flex-col items-center text-indigo-600" data-section="transmision">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h7a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
-      </svg>
-      <span class="text-xs">Transmisión</span>
-    </button>
-    <button class="nav-btn flex flex-col items-center" data-section="inscripciones">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M12 20h9M12 4h9M4 9h16M4 15h16M4 21h16" />
-      </svg>
-      <span class="text-xs">Inscripciones</span>
-    </button>
-    <button class="nav-btn flex flex-col items-center" data-section="donaciones">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M12 8c-1.104 0-2 .672-2 1.5S10.896 11 12 11s2 .672 2 1.5S13.104 14 12 14m0 0v1m0-7V7m0 10a5 5 0 100-10 5 5 0 000 10z" />
-      </svg>
-      <span class="text-xs">Donaciones</span>
-    </button>
-    <button class="nav-btn flex flex-col items-center" data-section="eco">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-      </svg>
-      <span class="text-xs">ECO</span>
-    </button>
-    <button class="nav-btn flex flex-col items-center" data-section="recomendados">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.905c.969 0 1.371 1.24.588 1.81l-3.97 2.884a1 1 0 00-.364 1.118l1.518 4.674c.3.921-.755 1.688-1.54 1.118l-3.97-2.884a1 1 0 00-1.176 0l-3.97 2.884c-.784.57-1.838-.197-1.539-1.118l1.518-4.674a1 1 0 00-.364-1.118L2.088 10.1c-.783-.57-.38-1.81.588-1.81h4.905a1 1 0 00.95-.69l1.518-4.674z" />
-      </svg>
-      <span class="text-xs">Recomendados</span>
-    </button>
-  </nav>
-
-  <!-- PapaParse -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
-  <script>
-    const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
-
-    document.querySelectorAll(".nav-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active", "text-indigo-600"));
-        btn.classList.add("active", "text-indigo-600");
-        const sectionId = "section-" + btn.dataset.section;
-        document.querySelectorAll("main > div").forEach(div => div.classList.add("section-hidden"));
-        const target = document.getElementById(sectionId);
-        if (target) target.classList.remove("section-hidden");
-      });
-    });
-
-    const menuBtn = document.getElementById("menuBtn");
-    const sidebar = document.getElementById("sidebar");
-    const closeSidebar = document.getElementById("closeSidebar");
-    menuBtn.addEventListener("click", () => sidebar.classList.toggle("translate-x-full"));
-    closeSidebar.addEventListener("click", () => sidebar.classList.add("translate-x-full"));
-
-    function esImagen(url) {
-      return !!url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url);
-    }
-
-    function convertirEnlaceYouTube(url) {
-      if (!url) return null;
-      url = String(url).trim();
-      let m = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/i);
-      if (m) return `https://www.youtube.com/embed/${m[1]}`;
-      m = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/i);
-      if (m) return `https://www.youtube.com/embed/${m[1]}`;
-      m = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/i);
-      if (m) return `https://www.youtube.com/embed/${m[1]}`;
-      m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/i);
-      if (m) return `https://www.youtube.com/embed/${m[1]}`;
-      m = url.match(/([a-zA-Z0-9_-]{11})$/);
-      if (m) return `https://www.youtube.com/embed/${m[1]}`;
-      return null;
-    }
-
-    async function cargarPublicaciones() {
-      const contenedor = document.getElementById("lista-publicaciones");
-      contenedor.innerHTML = "<p class='text-center text-gray-400'>Cargando publicaciones...</p>";
-
-      try {
-        const response = await fetch(URL_SHEET);
-        if (!response.ok) throw new Error("No se pudo acceder a la hoja");
-        const csvText = await response.text();
-        const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
-
-        contenedor.innerHTML = "";
-        if (!parsed || parsed.length === 0) {
-          contenedor.innerHTML = "<p class='text-center text-gray-400'>No hay publicaciones todavía.</p>";
-          return;
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Soy IBA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="icon.png" />
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            background:
+                radial-gradient(circle at 20% 20%, #e5d9f2, transparent 30%),
+                radial-gradient(circle at 80% 25%, #d0e1fa, transparent 30%),
+                radial-gradient(circle at 40% 80%, #c8f6f9, transparent 30%),
+                radial-gradient(circle at 70% 90%, #ffe6e6, transparent 30%),
+                #f3f7fb;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            color: rgb(100, 109, 174);
         }
 
-        parsed.reverse().forEach(rawRow => {
-          const row = {};
-          Object.keys(rawRow).forEach(k => {
-            const key = k ? k.trim().toLowerCase() : "";
-            row[key] = rawRow[k] ? String(rawRow[k]).trim() : "";
-          });
+        /* Animación de entrada suave */
+        .section-hidden {
+            opacity: 0;
+            transform: translateX(50px);
+            position: absolute;
+            width: 100%;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
 
-          if (!row.titulo && !row.contenido) return;
+        .section-active {
+            opacity: 1;
+            transform: translateX(0);
+            position: relative;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+    </style>
+</head>
 
-          const card = document.createElement("div");
-          card.className = "p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm";
+<body class="flex flex-col h-screen">
 
-          const h3 = document.createElement("h3");
-          h3.className = "font-semibold text-indigo-600 text-base";
-          h3.textContent = row.titulo || "Sin título";
-          card.appendChild(h3);
+    <!-- Header -->
+    <header class="flex items-center justify-between p-4 bg-white shadow-md">
+        <div class="flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span class="font-semibold">Iglesia Bíblica Antioquía</span>
+        </div>
+        <button id="menuBtn" class="p-2 rounded hover:bg-indigo-100">
+            ☰
+        </button>
+    </header>
 
-          if (row.fecha) {
-            const f = document.createElement("p");
-            f.className = "text-xs text-gray-500 mt-2 text-left";
-            f.textContent = row.fecha;
-            card.appendChild(f);
-          }
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50 overflow-y-auto">
+        <div class="flex justify-end p-2">
+            <button id="closeSidebar" class="p-2 text-gray-600 hover:text-red-500">
+                ✕
+            </button>
+        </div>
+        <div class="p-4 space-y-4">
+            <h2 class="text-lg font-bold">Misión</h2>
+            <p>Proclamar el evangelio y discipular con amor.</p>
+            <h2 class="text-lg font-bold">Visión</h2>
+            <p>Ser una iglesia centrada en Cristo.</p>
+            <h2 class="text-lg font-bold">Lo que creemos</h2>
+            <p>Basados en la Biblia como Palabra de Dios.</p>
+            <h2 class="text-lg font-bold">Horarios</h2>
+            <ul class="list-disc pl-5">
+                <li>Domingo 8:00 y 10:00 AM</li>
+                <li>Jueves 08:00 AM Ayuno / 07:00 PM Estudio bíblico</li>
+                <li>Sábado 04:00 PM Pre Juveniles / 06:00 PM Jóvenes</li>
+                <li>Último martes 07:00 PM Oración</li>
+            </ul>
+            <h2 class="text-lg font-bold">Recomendados</h2>
+            <p>Lecturas y música edificante.</p>
+            <h2 class="text-lg font-bold">Contacto</h2>
+            <p>Calle 38asur #38-34, Envigado<br>info@iglesiaiba.org</p>
+        </div>
+    </aside>
 
-          if (row.imagen) {
-            const posibleVideoDesdeImagen = convertirEnlaceYouTube(row.imagen);
-            if (posibleVideoDesdeImagen) {
-              const vidDiv = document.createElement("div");
-              vidDiv.className = "iframe-container mt-4";
-              vidDiv.innerHTML = `<iframe src="${posibleVideoDesdeImagen}" allowfullscreen></iframe>`;
-              card.appendChild(vidDiv);
-            } else if (esImagen(row.imagen)) {
-              const img = document.createElement("img");
-              img.src = row.imagen;
-              img.alt = row.titulo || "Imagen";
-              img.className = "w-full mt-2 rounded-lg shadow-sm";
-              card.appendChild(img);
-            }
-          }
+    <!-- Contenido principal -->
+    <main id="content" class="flex-1 overflow-y-auto p-4 pb-20 relative space-y-4">
 
-          if (row.video) {
-            const videoEmbed = convertirEnlaceYouTube(row.video);
-            if (videoEmbed) {
-              const vidDiv = document.createElement("div");
-              vidDiv.className = "iframe-container mt-4";
-              vidDiv.innerHTML = `<iframe src="${videoEmbed}" allowfullscreen></iframe>`;
-              card.appendChild(vidDiv);
-            }
-          }
+        <!-- Transmisión + Publicaciones -->
+        <div id="section-transmision" class="section-active bg-white p-4 rounded-xl shadow-md space-y-3">
+            <h2 class="text-lg font-semibold text-center">🎥 Transmisión del domingo anterior</h2>
 
-          if (row.spotify) {
-            const spotifyDiv = document.createElement("div");
-            spotifyDiv.className = "iframe-container mt-4";
-            spotifyDiv.innerHTML = `<iframe style="border-radius:12px" src="${row.spotify}" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
-            card.appendChild(spotifyDiv);
-          }
+            <!-- YouTube -->
+            <div class="aspect-w-16 aspect-h-9">
+                <iframe class="w-full h-64 rounded-lg"
+                    src="https://www.youtube.com/embed/live_stream?channel=UC2nMuRVJMdGW-M_CkogPe3Q"
+                    title="Transmisión YouTube" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+            </div>
 
-          if (row.contenido) {
-            const p = document.createElement("p");
-            p.className = "mt-1 whitespace-pre-line text-gray-700";
-            p.textContent = row.contenido;
-            card.appendChild(p);
-          }
+            <!-- Spotify -->
+            <div>
+                <iframe style="border-radius:12px"
+                    src="https://open.spotify.com/embed/episode/SPOTIFY_ID?utm_source=generator" width="100%"
+                    height="152" frameBorder="0" allowfullscreen=""
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy">
+                </iframe>
+            </div>
 
-          contenedor.appendChild(card);
+            <!-- Publicaciones -->
+            <div class="mt-6">
+                <h3 class="text-md font-semibold text-center mb-3">📰 Últimas Publicaciones</h3>
+                <div id="lista-publicaciones" class="space-y-3 text-gray-700 text-sm">
+                    <p class="text-center text-gray-400">Cargando publicaciones...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Otras secciones -->
+        <div id="section-inscripciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">📝 Inscripciones y
+            anuncios</div>
+        <div id="section-donaciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">💳 Donaciones: <br> QR +
+            Nº Cuenta</div>
+        <div id="section-eco" class="section-hidden bg-white p-4 rounded-xl shadow-md">🌍 Grupos ECO: mapa o links</div>
+        <div id="section-recomendados" class="section-hidden bg-white p-4 rounded-xl shadow-md">⭐ Recomendados</div>
+
+    </main>
+
+    <!-- Barra de navegación inferior -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-inner flex justify-around py-2">
+        <button class="nav-btn active flex flex-col items-center text-indigo-600" data-section="transmision">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h7a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
+            </svg>
+            <span class="text-xs">Transmisión</span>
+        </button>
+        <button class="nav-btn flex flex-col items-center" data-section="inscripciones">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 20h9M12 4h9M4 9h16M4 15h16M4 21h16" />
+            </svg>
+            <span class="text-xs">Inscripciones</span>
+        </button>
+        <button class="nav-btn flex flex-col items-center" data-section="donaciones">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8c-1.104 0-2 .672-2 1.5S10.896 11 12 11s2 .672 2 1.5S13.104 14 12 14m0 0v1m0-7V7m0 10a5 5 0 100-10 5 5 0 000 10z" />
+            </svg>
+            <span class="text-xs">Donaciones</span>
+        </button>
+        <button class="nav-btn flex flex-col items-center" data-section="eco">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            <span class="text-xs">ECO</span>
+        </button>
+        <button class="nav-btn flex flex-col items-center" data-section="recomendados">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.905c.969 0 1.371 1.24.588 1.81l-3.97 2.884a1 1 0 00-.364 1.118l1.518 4.674c.3.921-.755 1.688-1.54 1.118l-3.97-2.884a1 1 0 00-1.176 0l-3.97 2.884c-.784.57-1.838-.197-1.539-1.118l1.518-4.674a1 1 0 00-.364-1.118L2.088 10.1c-.783-.57-.38-1.81.588-1.81h4.905a1 1 0 00.95-.69l1.518-4.674z" />
+            </svg>
+            <span class="text-xs">Recomendados</span>
+        </button>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script>
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const sections = document.querySelectorAll('main > div');
+
+        navButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                navButtons.forEach(b => b.classList.remove('text-indigo-600', 'active'));
+                btn.classList.add('text-indigo-600', 'active');
+
+                const target = "section-" + btn.dataset.section;
+                sections.forEach(sec => {
+                    if (sec.id === target) {
+                        sec.classList.remove('section-hidden');
+                        sec.classList.add('section-active');
+                    } else {
+                        sec.classList.remove('section-active');
+                        sec.classList.add('section-hidden');
+                    }
+                });
+            });
         });
 
-      } catch (err) {
-        console.error(err);
-        contenedor.innerHTML = "<p class='text-center text-red-500'>Error al cargar publicaciones.</p>";
-      }
-    }
+        // Sidebar toggle
+        const menuBtn = document.getElementById("menuBtn");
+        const sidebar = document.getElementById("sidebar");
+        const closeSidebar = document.getElementById("closeSidebar");
 
-    cargarPublicaciones();
-  </script>
+        menuBtn.addEventListener("click", () => { sidebar.classList.toggle("translate-x-full"); });
+        closeSidebar.addEventListener("click", () => { sidebar.classList.add("translate-x-full"); });
+
+        // Publicaciones
+        const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
+
+        function esImagen(url) {
+            return !!url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url);
+        }
+
+        function convertirEnlaceYouTube(url) {
+            if (!url) return null;
+            url = String(url).trim();
+            let m = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/i);
+            if (m) return `https://www.youtube.com/embed/${m[1]}`;
+            m = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/i);
+            if (m) return `https://www.youtube.com/embed/${m[1]}`;
+            m = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/i);
+            if (m) return `https://www.youtube.com/embed/${m[1]}`;
+            m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/i);
+            if (m) return `https://www.youtube.com/embed/${m[1]}`;
+            m = url.match(/([a-zA-Z0-9_-]{11})$/);
+            if (m) return `https://www.youtube.com/embed/${m[1]}`;
+            return null;
+        }
+
+        async function cargarPublicaciones() {
+            const contenedor = document.getElementById("lista-publicaciones");
+            if (!contenedor) return;
+            contenedor.innerHTML = "<p class='text-center text-gray-400'>Cargando publicaciones...</p>";
+
+            try {
+                const response = await fetch(URL_SHEET);
+                if (!response.ok) throw new Error("No se pudo acceder a la hoja");
+                const csvText = await response.text();
+                const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
+                contenedor.innerHTML = "";
+
+                if (!parsed || parsed.length === 0) {
+                    contenedor.innerHTML = "<p class='text-center text-gray-400'>No hay publicaciones todavía.</p>";
+                    return;
+                }
+
+                parsed.reverse().forEach(rawRow => {
+                    const row = {};
+                    Object.keys(rawRow).forEach(k => {
+                        const key = k ? k.trim().toLowerCase() : "";
+                        row[key] = rawRow[k] ? String(rawRow[k]).trim() : "";
+                    });
+
+                    if (!row.titulo && !row.contenido) return;
+
+                    const card = document.createElement("div");
+                    card.className = "p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm";
+
+                    const h3 = document.createElement("h3");
+                    h3.className = "font-semibold text-indigo-600 text-base";
+                    h3.textContent = row.titulo || "Sin título";
+                    card.appendChild(h3);
+
+                    if (row.fecha) {
+                        const f = document.createElement("p");
+                        f.className = "text-xs text-gray-500 mt-2 text-left";
+                        f.textContent = row.fecha;
+                        card.appendChild(f);
+                    }
+
+                    if (row.imagen) {
+                        const posibleVideoDesdeImagen = convertirEnlaceYouTube(row.imagen);
+                        if (posibleVideoDesdeImagen) {
+                            const vidDiv = document.createElement("div");
+                            vidDiv.className = "mt-4";
+                            vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${posibleVideoDesdeImagen}" frameborder="0" allowfullscreen></iframe>`;
+                            card.appendChild(vidDiv);
+                        } else if (esImagen(row.imagen)) {
+                            const img = document.createElement("img");
+                            img.src = row.imagen;
+                            img.alt = row.titulo || "Imagen";
+                            img.className = "w-full mt-2 rounded-lg shadow-sm";
+                            card.appendChild(img);
+                        }
+                    }
+
+                    if (row.video) {
+                        const videoEmbed = convertirEnlaceYouTube(row.video);
+                        if (videoEmbed) {
+                            const vidDiv = document.createElement("div");
+                            vidDiv.className = "mt-4";
+                            vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${videoEmbed}" frameborder="0" allowfullscreen></iframe>`;
+                            card.appendChild(vidDiv);
+                        }
+                    }
+
+
+                    // NUEVO BLOQUE: Spotify
+                    if (row.Spotify) {
+                        const spotifyDiv = document.createElement("div");
+                        spotifyDiv.className = "mt-4";
+                        spotifyDiv.innerHTML = `<iframe style="border-radius:12px" src="${row.spotify}" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+                        card.appendChild(spotifyDiv);
+                    }
+
+                    if (row.contenido) {
+                        const p = document.createElement("p");
+                        p.className = "mt-1 whitespace-pre-line text-gray-700";
+                        p.textContent = row.contenido;
+                        card.appendChild(p);
+                    }
+
+                    contenedor.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error(err);
+                contenedor.innerHTML = "<p class='text-center text-red-500'>Error al cargar publicaciones.</p>";
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", cargarPublicaciones);
+    </script>
+
 </body>
 
 </html>
-
-
