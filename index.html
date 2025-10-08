@@ -126,56 +126,50 @@
         return;
       }
 
-      data.reverse().forEach(row => {
-        const titulo = row.titulo?.trim() || "Sin título";
-        const contenido = row.contenido?.trim() || "";
-        const imagen = row.imagen?.trim() || "";
-        const video = row.video?.trim() || "";
-        const fecha = row.fecha?.trim() || "";
+data.forEach(row => {
+  const card = document.createElement("div");
+  card.className = "bg-white rounded-lg shadow-md p-4 mb-4";
 
-        const card = document.createElement("div");
-        card.className = "p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm";
+  // Título
+  const title = document.createElement("h2");
+  title.className = "text-lg font-bold mb-2";
+  title.textContent = row["titulo"] || "";
+  card.appendChild(title);
 
-        // Título
-        card.innerHTML = `<h3 class="font-semibold text-indigo-600 text-base">${titulo}</h3>`;
+  // Contenido
+  const content = document.createElement("p");
+  content.className = "text-gray-700 mb-2";
+  content.textContent = row["contenido"] || "";
+  card.appendChild(content);
 
-        // Contenido
-        if (contenido) {
-          card.innerHTML += `<p class="mt-1 whitespace-pre-line">${contenido}</p>`;
-        }
-
-        // Mostrar video o imagen según corresponda
-        let mediaHTML = "";
-        if (video) {
-          const videoEmbed = convertirEnlaceYouTube(video);
-          if (videoEmbed) {
-            mediaHTML = `
-              <div class="mt-4">
-                <iframe class="w-full h-52 rounded-lg shadow"
-                  src="${videoEmbed}"
-                  title="${titulo}"
-                  frameborder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowfullscreen></iframe>
-              </div>`;
-          }
-        } else if (imagen && esImagen(imagen)) {
-          mediaHTML = `<img src="${imagen}" class="w-full mt-2 rounded-lg shadow-sm" alt="${titulo}">`;
-        }
-
-        card.innerHTML += mediaHTML;
-        if (fecha) card.innerHTML += `<p class="text-xs text-gray-500 mt-2 text-right">${fecha}</p>`;
-        contenedor.appendChild(card);
-      });
-
-    } catch (error) {
-      console.error(error);
-      contenedor.innerHTML = "<p class='text-center text-red-500'>Error al cargar publicaciones.</p>";
-    }
+  // Imagen (si existe)
+  if (row["imagen"]) {
+    const image = document.createElement("img");
+    image.src = row["imagen"];
+    image.alt = "Imagen de publicación";
+    image.className = "w-full h-52 object-cover rounded-lg shadow mb-2";
+    card.appendChild(image);
   }
 
-  // Cargar al iniciar
-  document.addEventListener("DOMContentLoaded", cargarPublicaciones);
+  // Video (si existe)
+  if (row["video"]) {
+    const video = document.createElement("iframe");
+    video.src = row["video"];
+    video.className = "w-full h-52 rounded-lg shadow mb-2";
+    video.title = "Video de publicación";
+    video.frameBorder = "0";
+    video.allowFullscreen = true;
+    card.appendChild(video);
+  }
+
+  // Fecha
+  const date = document.createElement("p");
+  date.className = "text-gray-500 text-sm";
+  date.textContent = row["fecha"] || "";
+  card.appendChild(date);
+
+  container.appendChild(card);
+});
   </script>
 </body>
 </html>
