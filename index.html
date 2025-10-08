@@ -1,17 +1,19 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Soy IBA</title>
+  <link rel="manifest" href="manifest.json" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="icon" href="icon.png" />
   <style>
-    html,body {
+    html,
+    body {
       height: 100%;
       margin: 0;
-      background: 
-        radial-gradient(circle at 20% 20%, #e5d9f2, transparent 30%),
+      background: radial-gradient(circle at 20% 20%, #e5d9f2, transparent 30%),
         radial-gradient(circle at 80% 25%, #d0e1fa, transparent 30%),
         radial-gradient(circle at 40% 80%, #c8f6f9, transparent 30%),
         radial-gradient(circle at 70% 90%, #ffe6e6, transparent 30%),
@@ -22,43 +24,40 @@
       color: rgb(100, 109, 174);
     }
 
-    /* Animación de entrada suave */
     .section-hidden {
-      opacity: 0;
-      transform: translateX(50px);
-      position: absolute;
-      width: 100%;
-      transition: opacity 0.5s ease, transform 0.5s ease;
+      display: none;
     }
+
     .section-active {
-      opacity: 1;
-      transform: translateX(0);
-      position: relative;
-      transition: opacity 0.5s ease, transform 0.5s ease;
+      display: block;
+    }
+
+    .nav-btn.active svg,
+    .nav-btn.active span {
+      color: #4f46e5;
+      font-weight: 600;
     }
   </style>
 </head>
-<body class="flex flex-col h-screen">
 
+<body class="flex flex-col min-h-screen">
   <!-- Header -->
   <header class="flex items-center justify-between p-4 bg-white shadow-md">
     <div class="flex items-center space-x-2">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
       </svg>
       <span class="font-semibold">Iglesia Bíblica Antioquía</span>
     </div>
-    <button id="menuBtn" class="p-2 rounded hover:bg-indigo-100">
-      ☰
-    </button>
+    <button id="menuBtn" class="p-2 rounded hover:bg-indigo-100">☰</button>
   </header>
 
   <!-- Sidebar -->
-  <aside id="sidebar" class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50 overflow-y-auto">
+  <aside id="sidebar"
+    class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50 overflow-y-auto">
     <div class="flex justify-end p-2">
-      <button id="closeSidebar" class="p-2 text-gray-600 hover:text-red-500">
-        ✕
-      </button>
+      <button id="closeSidebar" class="p-2 text-gray-600 hover:text-red-500">✕</button>
     </div>
     <div class="p-4 space-y-4">
       <h2 class="text-lg font-bold">Misión</h2>
@@ -81,96 +80,101 @@
     </div>
   </aside>
 
-  <!-- Contenido principal -->
-  <main id="content" class="flex-1 overflow-y-auto p-4 pb-20 relative space-y-4">
-
-    <!-- Transmisión + Publicaciones -->
-    <div id="section-transmision" class="section-active bg-white p-4 rounded-xl shadow-md space-y-3">
+  <!-- Contenido -->
+  <main id="content" class="flex-1 overflow-y-auto p-4 pb-20 relative space-y-2">
+    <!-- Transmisión -->
+    <div id="section-transmision" class="bg-white p-4 rounded-xl shadow-md space-y-3">
       <h2 class="text-lg font-semibold text-center">🎥 Transmisión del domingo anterior</h2>
-      
+
       <!-- YouTube -->
       <div class="aspect-w-16 aspect-h-9">
         <iframe class="w-full h-64 rounded-lg"
-          src="https://www.youtube.com/embed/live_stream?channel=UC2nMuRVJMdGW-M_CkogPe3Q"
-          title="Transmisión YouTube"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          src="https://www.youtube.com/embed/live_stream?channel=UC2nMuRVJMdGW-M_CkogPe3Q" title="Transmisión YouTube"
+          frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen></iframe>
       </div>
 
       <!-- Spotify -->
       <div>
-        <iframe style="border-radius:12px" 
-          src="https://open.spotify.com/embed/episode/SPOTIFY_ID?utm_source=generator" 
-          width="100%" height="152" frameBorder="0" 
-          allowfullscreen="" 
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-          loading="lazy">
-        </iframe>
+        <iframe style="border-radius:12px"
+          src="https://open.spotify.com/embed/episode/SPOTIFY_ID?utm_source=generator" width="100%" height="152"
+          frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"></iframe>
       </div>
+    </div>
 
-      <!-- Publicaciones -->
-      <div class="mt-6">
-        <h3 class="text-md font-semibold text-center mb-3">📰 Últimas Publicaciones</h3>
-        <div id="lista-publicaciones" class="space-y-3 text-gray-700 text-sm">
-          <p class="text-center text-gray-400">Cargando publicaciones...</p>
-        </div>
+    <!-- Publicaciones -->
+    <div id="section-publicaciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">
+      <h2 class="text-lg font-semibold text-center mb-3">📰 Publicaciones</h2>
+      <div id="lista-publicaciones" class="space-y-3 text-gray-700 text-sm">
+        <p class="text-center text-gray-400">Cargando publicaciones...</p>
       </div>
     </div>
 
     <!-- Otras secciones -->
-    <div id="section-inscripciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">📝 Inscripciones y anuncios</div>
-    <div id="section-donaciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">💳 Donaciones: <br> QR + Nº Cuenta</div>
+    <div id="section-inscripciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">📝 Inscripciones y anuncios
+    </div>
+    <div id="section-donaciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">💳 Donaciones: <br> QR +
+      Nº Cuenta
+    </div>
     <div id="section-eco" class="section-hidden bg-white p-4 rounded-xl shadow-md">🌍 Grupos ECO: mapa o links</div>
     <div id="section-recomendados" class="section-hidden bg-white p-4 rounded-xl shadow-md">⭐ Recomendados</div>
-
   </main>
 
-  <!-- Barra de navegación inferior -->
+  <!-- Barra inferior -->
   <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-inner flex justify-around py-2">
     <button class="nav-btn active flex flex-col items-center text-indigo-600" data-section="transmision">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h7a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h7a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
+      </svg>
       <span class="text-xs">Transmisión</span>
     </button>
     <button class="nav-btn flex flex-col items-center" data-section="inscripciones">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20h9M12 4h9M4 9h16M4 15h16M4 21h16"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 20h9M12 4h9M4 9h16M4 15h16M4 21h16" />
+      </svg>
       <span class="text-xs">Inscripciones</span>
     </button>
     <button class="nav-btn flex flex-col items-center" data-section="donaciones">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.104 0-2 .672-2 1.5S10.896 11 12 11s2 .672 2 1.5S13.104 14 12 14m0 0v1m0-7V7m0 10a5 5 0 100-10 5 5 0 000 10z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 8c-1.104 0-2 .672-2 1.5S10.896 11 12 11s2 .672 2 1.5S13.104 14 12 14m0 0v1m0-7V7m0 10a5 5 0 100-10 5 5 0 000 10z" />
+      </svg>
       <span class="text-xs">Donaciones</span>
     </button>
     <button class="nav-btn flex flex-col items-center" data-section="eco">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      </svg>
       <span class="text-xs">ECO</span>
     </button>
     <button class="nav-btn flex flex-col items-center" data-section="recomendados">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.905c.969 0 1.371 1.24.588 1.81l-3.97 2.884a1 1 0 00-.364 1.118l1.518 4.674c.3.921-.755 1.688-1.54 1.118l-3.97-2.884a1 1 0 00-1.176 0l-3.97 2.884c-.784.57-1.838-.197-1.539-1.118l1.518-4.674a1 1 0 00-.364-1.118L2.088 10.1c-.783-.57-.38-1.81.588-1.81h4.905a1 1 0 00.95-.69l1.518-4.674z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.905c.969 0 1.371 1.24.588 1.81l-3.97 2.884a1 1 0 00-.364 1.118l1.518 4.674c.3.921-.755 1.688-1.54 1.118l-3.97-2.884a1 1 0 00-1.176 0l-3.97 2.884c-.784.57-1.838-.197-1.539-1.118l1.518-4.674a1 1 0 00-.364-1.118L2.088 10.1c-.783-.57-.38-1.81.588-1.81h4.905a1 1 0 00.95-.69l1.518-4.674z" />
+      </svg>
       <span class="text-xs">Recomendados</span>
     </button>
   </nav>
 
-  <!-- Scripts -->
+  <!-- PapaParse -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
   <script>
-    const navButtons = document.querySelectorAll('.nav-btn');
-    const sections = document.querySelectorAll('main > div');
+    const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
 
-    navButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        navButtons.forEach(b => b.classList.remove('text-indigo-600','active'));
-        btn.classList.add('text-indigo-600','active');
-
-        const target = "section-" + btn.dataset.section;
-        sections.forEach(sec => {
-          if(sec.id === target){
-            sec.classList.remove('section-hidden');
-            sec.classList.add('section-active');
-          } else {
-            sec.classList.remove('section-active');
-            sec.classList.add('section-hidden');
-          }
-        });
+    // NAV HANDLER
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active", "text-indigo-600"));
+        btn.classList.add("active", "text-indigo-600");
+        const sectionId = "section-" + btn.dataset.section;
+        document.querySelectorAll("main > div").forEach(div => div.classList.add("section-hidden"));
+        const target = document.getElementById(sectionId);
+        if (target) target.classList.remove("section-hidden");
       });
     });
 
@@ -178,12 +182,8 @@
     const menuBtn = document.getElementById("menuBtn");
     const sidebar = document.getElementById("sidebar");
     const closeSidebar = document.getElementById("closeSidebar");
-
-    menuBtn.addEventListener("click", () => { sidebar.classList.toggle("translate-x-full"); });
-    closeSidebar.addEventListener("click", () => { sidebar.classList.add("translate-x-full"); });
-
-    // Publicaciones
-    const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
+    menuBtn.addEventListener("click", () => sidebar.classList.toggle("translate-x-full"));
+    closeSidebar.addEventListener("click", () => sidebar.classList.add("translate-x-full"));
 
     function esImagen(url) {
       return !!url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url);
@@ -207,7 +207,6 @@
 
     async function cargarPublicaciones() {
       const contenedor = document.getElementById("lista-publicaciones");
-      if (!contenedor) return;
       contenedor.innerHTML = "<p class='text-center text-gray-400'>Cargando publicaciones...</p>";
 
       try {
@@ -215,8 +214,8 @@
         if (!response.ok) throw new Error("No se pudo acceder a la hoja");
         const csvText = await response.text();
         const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
-        contenedor.innerHTML = "";
 
+        contenedor.innerHTML = "";
         if (!parsed || parsed.length === 0) {
           contenedor.innerHTML = "<p class='text-center text-gray-400'>No hay publicaciones todavía.</p>";
           return;
@@ -272,6 +271,13 @@
             }
           }
 
+          if (row.spotify) {
+            const spotifyDiv = document.createElement("div");
+            spotifyDiv.className = "mt-4";
+            spotifyDiv.innerHTML = `<iframe style="border-radius:12px" src="${row.spotify}" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+            card.appendChild(spotifyDiv);
+          }
+
           if (row.contenido) {
             const p = document.createElement("p");
             p.className = "mt-1 whitespace-pre-line text-gray-700";
@@ -290,7 +296,8 @@
 
     document.addEventListener("DOMContentLoaded", cargarPublicaciones);
   </script>
-
 </body>
+
 </html>
+
 
