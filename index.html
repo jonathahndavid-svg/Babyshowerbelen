@@ -37,6 +37,24 @@
       color: #4f46e5;
       font-weight: 600;
     }
+
+    .iframe-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%; /* 16:9 */
+      height: 0;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    .iframe-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
   </style>
 </head>
 
@@ -87,18 +105,19 @@
       <h2 class="text-lg font-semibold text-center">🎥 Transmisión del domingo anterior</h2>
 
       <!-- YouTube -->
-      <div class="aspect-w-16 aspect-h-9">
-        <iframe class="w-full h-64 rounded-lg"
-          src="https://www.youtube.com/embed/live_stream?channel=UC2nMuRVJMdGW-M_CkogPe3Q" title="Transmisión YouTube"
-          frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      <div class="iframe-container">
+        <iframe
+          src="https://www.youtube.com/embed/live_stream?channel=UC2nMuRVJMdGW-M_CkogPe3Q"
+          title="Transmisión YouTube"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen></iframe>
       </div>
 
       <!-- Spotify -->
-      <div>
+      <div class="iframe-container mt-4">
         <iframe style="border-radius:12px"
-          src="https://open.spotify.com/embed/episode/SPOTIFY_ID?utm_source=generator" width="100%" height="152"
-          frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          src="https://open.spotify.com/embed/episode/SPOTIFY_ID?utm_source=generator"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
           loading="lazy"></iframe>
       </div>
     </div>
@@ -166,7 +185,6 @@
   <script>
     const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
 
-    // NAV HANDLER
     document.querySelectorAll(".nav-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active", "text-indigo-600"));
@@ -178,7 +196,6 @@
       });
     });
 
-    // Sidebar toggle
     const menuBtn = document.getElementById("menuBtn");
     const sidebar = document.getElementById("sidebar");
     const closeSidebar = document.getElementById("closeSidebar");
@@ -249,8 +266,8 @@
             const posibleVideoDesdeImagen = convertirEnlaceYouTube(row.imagen);
             if (posibleVideoDesdeImagen) {
               const vidDiv = document.createElement("div");
-              vidDiv.className = "mt-4";
-              vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${posibleVideoDesdeImagen}" frameborder="0" allowfullscreen></iframe>`;
+              vidDiv.className = "iframe-container mt-4";
+              vidDiv.innerHTML = `<iframe src="${posibleVideoDesdeImagen}" allowfullscreen></iframe>`;
               card.appendChild(vidDiv);
             } else if (esImagen(row.imagen)) {
               const img = document.createElement("img");
@@ -265,16 +282,16 @@
             const videoEmbed = convertirEnlaceYouTube(row.video);
             if (videoEmbed) {
               const vidDiv = document.createElement("div");
-              vidDiv.className = "mt-4";
-              vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${videoEmbed}" frameborder="0" allowfullscreen></iframe>`;
+              vidDiv.className = "iframe-container mt-4";
+              vidDiv.innerHTML = `<iframe src="${videoEmbed}" allowfullscreen></iframe>`;
               card.appendChild(vidDiv);
             }
           }
 
           if (row.spotify) {
             const spotifyDiv = document.createElement("div");
-            spotifyDiv.className = "mt-4";
-            spotifyDiv.innerHTML = `<iframe style="border-radius:12px" src="${row.spotify}" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+            spotifyDiv.className = "iframe-container mt-4";
+            spotifyDiv.innerHTML = `<iframe style="border-radius:12px" src="${row.spotify}" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
             card.appendChild(spotifyDiv);
           }
 
@@ -294,7 +311,7 @@
       }
     }
 
-    document.addEventListener("DOMContentLoaded", cargarPublicaciones);
+    cargarPublicaciones();
   </script>
 </body>
 
