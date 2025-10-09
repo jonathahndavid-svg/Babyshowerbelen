@@ -2,398 +2,209 @@
 <html lang="es">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Soy IBA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" href="icon.png" />
-    <style>
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-            background:
-                radial-gradient(circle at 20% 20%, #e5d9f2, transparent 30%),
-                radial-gradient(circle at 80% 25%, #d0e1fa, transparent 30%),
-                radial-gradient(circle at 40% 80%, #c8f6f9, transparent 30%),
-                radial-gradient(circle at 70% 90%, #ffe6e6, transparent 30%),
-                #f3f7fb;
-            background-attachment: fixed;
-            display: flex;
-            flex-direction: column;
-            color: rgb(100, 109, 174);
-        }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PWA Soy IBA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .story-border {
+      border: 2px solid #e1306c;
+      border-radius: 50%;
+      padding: 3px;
+    }
 
-        /* Animación de entrada suave */
-        .section-hidden {
-            opacity: 0;
-            transform: translateX(50px);
-            position: absolute;
-            width: 100%;
-            transition: opacity 0.5s ease, transform 0.5s ease;
-        }
-
-        .section-active {
-            opacity: 1;
-            transform: translateX(0);
-            position: relative;
-            transition: opacity 0.5s ease, transform 0.5s ease;
-        }
-
-        /* Tarjetas centradas y más angostas */
-        #lista-publicaciones {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        #lista-publicaciones>div {
-            width: 100%;
-            max-width: 500px;
-        }
-    </style>
+    .fade {
+      transition: opacity 0.5s ease-in-out;
+    }
+  </style>
 </head>
 
-<body class="flex flex-col h-screen">
+<body class="bg-gray-100 text-gray-800">
+  <!-- RIBBON -->
+  <header class="flex items-center justify-between px-4 py-3 bg-white shadow">
+    <h1 class="text-2xl font-bold text-pink-600">Soy IBA</h1>
+    <div class="flex space-x-4">
+      <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
+          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+      <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
+          d="M21 15a2 2 0 01-2 2H5a2 2 0 01-2-2m18 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v6m18 0l-9-6-9 6" /></svg>
+    </div>
+  </header>
 
-    <!-- Header -->
-    <header class="flex items-center justify-between p-4 bg-white shadow-md">
-        <div class="flex items-center space-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            <span class="font-semibold">Iglesia Bíblica Antioquía</span>
+  <!-- EVENTOS -->
+  <section class="p-4">
+    <h2 class="text-lg font-semibold mb-3">Eventos</h2>
+    <div class="flex space-x-4 overflow-x-auto pb-3">
+      <div class="flex-shrink-0 text-center">
+        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300"
+          class="w-20 h-20 object-cover rounded-full story-border cursor-pointer event"
+          data-title="Festival Gastronómico"
+          data-desc="Disfruta los sabores del mundo este fin de semana." />
+        <p class="text-sm mt-1">Festival</p>
+      </div>
+
+      <div class="flex-shrink-0 text-center">
+        <img src="https://images.unsplash.com/photo-1521335629791-ce4aec67dd47?w=300"
+          class="w-20 h-20 object-cover rounded-full story-border cursor-pointer event"
+          data-title="Noche de Jazz"
+          data-desc="Ven a disfrutar buena música en vivo." />
+        <p class="text-sm mt-1">Jazz</p>
+      </div>
+
+      <div class="flex-shrink-0 text-center">
+        <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=300"
+          class="w-20 h-20 object-cover rounded-full story-border cursor-pointer event"
+          data-title="Carrera 10K"
+          data-desc="Participa en la gran carrera anual." />
+        <p class="text-sm mt-1">Carrera</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOVEDADES -->
+  <section class="p-4">
+    <h2 class="text-lg font-semibold mb-3">Novedades</h2>
+    <div id="novedadesContainer" class="space-y-4">
+      <p class="text-gray-500 text-center">Cargando novedades...</p>
+    </div>
+  </section>
+
+  <!-- MODAL EVENTO -->
+  <div id="storyModal" class="hidden fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+    <div class="relative w-full h-full flex items-center justify-center">
+      <img id="storyImage" class="object-contain max-h-full max-w-full fade cursor-pointer" />
+      <div class="absolute bottom-0 w-full p-4 bg-gradient-to-t from-black/70 to-transparent text-white">
+        <h2 id="storyTitle" class="text-lg font-bold"></h2>
+        <p id="storyDesc" class="text-sm mb-2"></p>
+        <div class="flex justify-between items-center">
+          <span id="timer" class="text-xs bg-black/50 px-2 py-1 rounded">5s</span>
+          <button id="shareBtn" class="text-xs bg-pink-600 px-2 py-1 rounded">Compartir</button>
         </div>
-        <button id="menuBtn" class="p-2 rounded hover:bg-indigo-100">
-            ☰
-        </button>
-    </header>
+      </div>
+      <button id="closeModal" class="absolute top-3 right-3 bg-black/50 text-white px-2 py-1 rounded">✕</button>
+    </div>
+  </div>
 
-    <!-- Sidebar -->
-    <aside id="sidebar"
-        class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50 overflow-y-auto">
-        <div class="flex justify-end p-2">
-            <button id="closeSidebar" class="p-2 text-gray-600 hover:text-red-500">
-                ✕
-            </button>
-        </div>
-        <div class="p-4 space-y-4">
-            <h2 class="text-lg font-bold">Misión</h2>
-            <p>Proclamar el evangelio y discipular con amor.</p>
-            <h2 class="text-lg font-bold">Visión</h2>
-            <p>Ser una iglesia centrada en Cristo.</p>
-            <h2 class="text-lg font-bold">Lo que creemos</h2>
-            <p>Basados en la Biblia como Palabra de Dios.</p>
-            <h2 class="text-lg font-bold">Horarios</h2>
-            <ul class="list-disc pl-5">
-                <li>Domingo 8:00 y 10:00 AM</li>
-                <li>Jueves 08:00 AM Ayuno / 07:00 PM Estudio bíblico</li>
-                <li>Sábado 04:00 PM Pre Juveniles / 06:00 PM Jóvenes</li>
-                <li>Último martes 07:00 PM Oración</li>
-            </ul>
-            <h2 class="text-lg font-bold">Recomendados</h2>
-            <p>Lecturas y música edificante.</p>
-            <h2 class="text-lg font-bold">Contacto</h2>
-            <p>Calle 38asur #38-34, Envigado<br>info@iglesiaiba.org</p>
-        </div>
-    </aside>
+  <script>
+    /* === CONFIGURAR TU URL DE GOOGLE SHEET AQUÍ === */
+    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
 
-    <!-- Contenido principal -->
-    <main id="content" class="flex-1 overflow-y-auto p-4 pb-20 relative space-y-4">
+    /* === EVENTOS === */
+    const events = document.querySelectorAll(".event");
+    const modal = document.getElementById("storyModal");
+    const storyImage = document.getElementById("storyImage");
+    const storyTitle = document.getElementById("storyTitle");
+    const storyDesc = document.getElementById("storyDesc");
+    const closeModal = document.getElementById("closeModal");
+    const timerEl = document.getElementById("timer");
+    const shareBtn = document.getElementById("shareBtn");
 
-        <!-- Transmisión + Publicaciones -->
-        <div id="section-transmision" class="section-active bg-white p-4 rounded-xl shadow-md space-y-3">
-            <h2 class="text-lg font-semibold text-center">✨Novedades</h2>
+    let currentIndex = 0;
+    let interval;
+    let countdown;
 
-            <!-- ✨Novedades -->
-            <div class="mt-6">
-                <!--<h3 class="text-md font-semibold text-center mb-3">✨Novedades </h3> -->
-                <div id="lista-publicaciones" class="text-gray-700 text-sm">
-                    <p class="text-center text-gray-400">Cargando novedades...</p>
-                </div>
+    const eventList = Array.from(events).map(e => ({
+      src: e.src,
+      title: e.dataset.title,
+      desc: e.dataset.desc
+    }));
+
+    function showEvent(index) {
+      const ev = eventList[index];
+      storyImage.src = ev.src;
+      storyTitle.textContent = ev.title;
+      storyDesc.textContent = ev.desc;
+      modal.classList.remove("hidden");
+
+      clearInterval(interval);
+      clearInterval(countdown);
+
+      let seconds = 5;
+      timerEl.textContent = `${seconds}s`;
+      countdown = setInterval(() => {
+        seconds--;
+        timerEl.textContent = `${seconds}s`;
+      }, 1000);
+
+      interval = setInterval(() => {
+        nextEvent();
+      }, 5000);
+    }
+
+    function nextEvent() {
+      currentIndex = (currentIndex + 1) % eventList.length;
+      showEvent(currentIndex);
+    }
+
+    events.forEach((e, i) => {
+      e.addEventListener("click", () => {
+        currentIndex = i;
+        showEvent(i);
+      });
+    });
+
+    storyImage.addEventListener("click", nextEvent);
+    closeModal.addEventListener("click", () => {
+      modal.classList.add("hidden");
+      clearInterval(interval);
+      clearInterval(countdown);
+    });
+
+    shareBtn.addEventListener("click", () => {
+      navigator.share
+        ? navigator.share({ title: storyTitle.textContent, text: storyDesc.textContent, url: window.location.href })
+        : alert("Tu navegador no soporta compartir.");
+    });
+
+    /* === CARGAR NOVEDADES DESDE GOOGLE SHEETS === */
+    async function loadNovedades() {
+      const container = document.getElementById("novedadesContainer");
+      try {
+        const res = await fetch(sheetURL);
+        const text = await res.text();
+        const json = JSON.parse(text.substr(47).slice(0, -2)); // limpia el formato de Google
+        const rows = json.table.rows;
+
+        const data = rows.map(r => ({
+          Titulo: r.c[0]?.v || "",
+          Contenido: r.c[1]?.v || "",
+          Imagen: r.c[2]?.v || "",
+          Video: r.c[3]?.v || "",
+          Spotify: r.c[4]?.v || ""
+        })).reverse(); // ordena de más nuevo a más viejo
+
+        container.innerHTML = "";
+        data.forEach(n => {
+          const card = document.createElement("div");
+          card.className = "bg-white rounded-xl shadow";
+
+          let media = "";
+          if (n.Imagen) media = `<img src="${n.Imagen}" class="w-full h-60 object-cover rounded-t-xl">`;
+          else if (n.Video) media = `<video src="${n.Video}" controls class="w-full h-60 rounded-t-xl"></video>`;
+          else if (n.Spotify) media = `<iframe style="border-radius:12px" src="${n.Spotify}" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture"></iframe>`;
+
+          card.innerHTML = `
+            ${media}
+            <div class="p-3">
+              <h3 class="font-semibold">${n.Titulo}</h3>
+              <p class="text-sm text-gray-500">${new Date().toLocaleDateString()}</p>
+              <p class="text-sm mt-2">${n.Contenido}</p>
             </div>
-        </div>
-
-        <!-- Otras secciones -->
-        <div id="section-inscripciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">📝 Inscripciones y
-            anuncios</div>
-        <div id="section-donaciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">💳 Donaciones: <br> QR +
-            Nº Cuenta</div>
-        <div id="section-eco" class="section-hidden bg-white p-4 rounded-xl shadow-md">🌍 Grupos ECO: mapa o links</div>
-        <div id="section-recomendados" class="section-hidden bg-white p-4 rounded-xl shadow-md">⭐ Recomendados</div>
-
-    </main>
-
-    <!-- Barra de navegación inferior -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-inner flex justify-around py-2">
-        <button class="nav-btn active flex flex-col items-center text-indigo-600" data-section="transmision">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h7a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
-            </svg>
-            <span class="text-xs">✨Novedades</span>
-        </button>
-        <button class="nav-btn flex flex-col items-center" data-section="inscripciones">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 20h9M12 4h9M4 9h16M4 15h16M4 21h16" />
-            </svg>
-            <span class="text-xs">Inscripciones</span>
-        </button>
-        <button class="nav-btn flex flex-col items-center" data-section="donaciones">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 8c-1.104 0-2 .672-2 1.5S10.896 11 12 11s2 .672 2 1.5S13.104 14 12 14m0 0v1m0-7V7m0 10a5 5 0 100-10 5 5 0 000 10z" />
-            </svg>
-            <span class="text-xs">Donaciones</span>
-        </button>
-        <button class="nav-btn flex flex-col items-center" data-section="eco">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg>
-            <span class="text-xs">ECO</span>
-        </button>
-        <button class="nav-btn flex flex-col items-center" data-section="recomendados">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.905c.969 0 1.371 1.24.588 1.81l-3.97 2.884a1 1 0 00-.364 1.118l1.518 4.674c.3.921-.755 1.688-1.54 1.118l-3.97-2.884a1 1 0 00-1.176 0l-3.97 2.884c-.784.57-1.838-.197-1.539-1.118l1.518-4.674a1 1 0 00-.364-1.118L2.088 10.1c-.783-.57-.38-1.81.588-1.81h4.905a1 1 0 00.95-.69l1.518-4.674z" />
-            </svg>
-            <span class="text-xs">Recomendados</span>
-        </button>
-    </nav>
-
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-    <script>
-        const navButtons = document.querySelectorAll('.nav-btn');
-        const sections = document.querySelectorAll('main > div');
-
-        navButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                navButtons.forEach(b => b.classList.remove('text-indigo-600', 'active'));
-                btn.classList.add('text-indigo-600', 'active');
-
-                const target = "section-" + btn.dataset.section;
-                sections.forEach(sec => {
-                    if (sec.id === target) {
-                        sec.classList.remove('section-hidden');
-                        sec.classList.add('section-active');
-                    } else {
-                        sec.classList.remove('section-active');
-                        sec.classList.add('section-hidden');
-                    }
-                });
-            });
+          `;
+          container.appendChild(card);
         });
 
-        const menuBtn = document.getElementById("menuBtn");
-        const sidebar = document.getElementById("sidebar");
-        const closeSidebar = document.getElementById("closeSidebar");
+      } catch (e) {
+        container.innerHTML = `<p class="text-red-500 text-center">Error al cargar datos de Google Sheets</p>`;
+        console.error(e);
+      }
+    }
 
-        menuBtn.addEventListener("click", () => { sidebar.classList.toggle("translate-x-full"); });
-        closeSidebar.addEventListener("click", () => { sidebar.classList.add("translate-x-full"); });
-
-        const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
-
-        function esImagen(url) {
-            return !!url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url);
-        }
-
-        function convertirEnlaceYouTube(url) {
-            if (!url) return null;
-            url = String(url).trim();
-            let m = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/i);
-            if (m) return `https://www.youtube.com/embed/${m[1]}`;
-            m = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/i);
-            if (m) return `https://www.youtube.com/embed/${m[1]}`;
-            m = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/i);
-            if (m) return `https://www.youtube.com/embed/${m[1]}`;
-            m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/i);
-            if (m) return `https://www.youtube.com/embed/${m[1]}`;
-            return null;
-        }
-
-        function convertirSpotifyEnEmbed(url) {
-            if (!url) return null;
-
-            // Limpiamos parámetros extra (como ?si=...)
-            url = url.split("?")[0];
-
-            // Eliminamos /intl-es si existe
-            url = url.replace("/intl-es", "");
-
-            // Extraemos tipo y ID
-            const match = url.match(/open\.spotify\.com\/(track|album|playlist)\/([a-zA-Z0-9]+)/);
-            if (match) {
-                const tipo = match[1]; // track, album, playlist
-                const id = match[2];
-                return `https://open.spotify.com/embed/${tipo}/${id}`;
-            }
-
-            // Si ya es embed, lo devolvemos
-            if (url.includes("embed")) return url;
-
-            return null;
-        }
-
-        async function cargarPublicaciones() {
-            const contenedor = document.getElementById("lista-publicaciones");
-            if (!contenedor) return;
-            contenedor.innerHTML = "<p class='text-center text-gray-400'>Cargando publicaciones...</p>";
-
-            try {
-                const response = await fetch(URL_SHEET);
-                if (!response.ok) throw new Error("No se pudo acceder a la hoja");
-
-                const csvText = await response.text();
-                const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
-
-                contenedor.innerHTML = "";
-
-                if (!parsed || parsed.length === 0) {
-                    contenedor.innerHTML = "<p class='text-center text-gray-400'>No hay publicaciones todavía.</p>";
-                    return;
-                }
-
-                parsed.reverse().forEach(rawRow => {
-                    const row = {};
-                    Object.keys(rawRow).forEach(k => {
-                        const key = k ? k.trim().toLowerCase() : "";
-                        row[key] = rawRow[k] ? String(rawRow[k]).trim() : "";
-                    });
-
-                    if (!row.titulo && !row.contenido) return;
-
-                    const card = document.createElement("div");
-                    card.className = "p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm";
-
-                    // Fecha
-                    if (row.fecha) {
-                        const f = document.createElement("p");
-                        f.className = "text-xs text-gray-500 mt-2 text-right";
-                        f.textContent = row.fecha;
-                        card.appendChild(f);
-                    }
-
-                    // Título
-                    const h3 = document.createElement("h3");
-                    h3.className = "font-semibold text-indigo-600 text-base";
-                    h3.textContent = row.titulo || "Sin título";
-                    card.appendChild(h3);
-
-                    // Contenido
-                    if (row.contenido) {
-                        const p = document.createElement("p");
-                        p.className = "mt-2 whitespace-pre-line text-gray-700";
-                        p.textContent = row.contenido;
-                        card.appendChild(p);
-                    }
-
-
-                    // Imagen o video desde columna 'imagen'
-                    if (row.imagen) {
-                        const posibleVideo = convertirEnlaceYouTube(row.imagen);
-                        if (posibleVideo) {
-                            const vidDiv = document.createElement("div");
-                            vidDiv.className = "mt-4";
-                            vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${posibleVideo}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
-                            card.appendChild(vidDiv);
-                        } else if (esImagen(row.imagen)) {
-                            const img = document.createElement("img");
-                            img.src = row.imagen;
-                            img.alt = row.titulo || "Imagen";
-                            img.className = "w-full mt-2 rounded-lg shadow-sm";
-                            img.loading = "lazy";
-                            card.appendChild(img);
-                        }
-                    }
-
-                    // Video (columna video)
-                    if (row.video) {
-                        const videoEmbed = convertirEnlaceYouTube(row.video);
-                        if (videoEmbed) {
-                            const vidDiv = document.createElement("div");
-                            vidDiv.className = "mt-4";
-                            vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${videoEmbed}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
-                            card.appendChild(vidDiv);
-                        }
-                    }
-
-                    // Spotify (columna spotify)
-                    if (row.spotify) {
-                        const spotifyEmbed = convertirSpotifyEnEmbed(row.spotify);
-                        if (spotifyEmbed) {
-                            const spDiv = document.createElement("div");
-                            spDiv.className = "mt-4";
-                            spDiv.innerHTML = `
-            <iframe 
-                style="border-radius:12px" 
-                src="${spotifyEmbed}" 
-                width="100%" 
-                height="152" 
-                frameborder="0" 
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                loading="lazy">
-            </iframe>`;
-                            card.appendChild(spDiv);
-                        }
-                    }
-
-
-
-                    // Botón Compartir WhatsApp elegante
-                    const shareBtn = document.createElement("button");
-                    shareBtn.className = "mt-3 px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm flex items-center justify-center gap-1";
-                    shareBtn.innerHTML = "📤 Compartir WhatsApp";
-
-                    shareBtn.addEventListener("click", () => {
-                        // Construir mensaje dinámicamente
-                        let mensaje = `*${row.titulo || "Sin título"}*\n\n`;
-
-                        if (row.contenido) mensaje += `${row.contenido}\n\n`;
-                        if (row.imagen) mensaje += `Imagen: ${row.imagen}\n`;
-                        if (row.video) mensaje += `Video: ${row.video}\n`;
-                        if (row.spotify) mensaje += `Spotify: ${row.spotify}\n`;
-
-                        mensaje += `\n_Compartido desde SoyIBA_\nhttps://jonathahndavid-svg.github.io/Babyshowerbelen/index.html`;
-
-                        // Codificar mensaje para URL
-                        const url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(mensaje);
-
-                        // Abrir WhatsApp en nueva ventana
-                        window.open(url, "_blank");
-                    });
-
-                    // Añadir al card antes de la fecha
-                    const fechaElemento = card.querySelector(".text-xs.text-gray-500");
-                    if (fechaElemento) {
-                        card.insertBefore(shareBtn, fechaElemento);
-                    } else {
-                        card.appendChild(shareBtn);
-                    }
-
-
-                    contenedor.appendChild(card);
-                });
-
-            } catch (err) {
-                console.error(err);
-                contenedor.innerHTML = "<p class='text-center text-red-500'>Error al cargar publicaciones.</p>";
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", cargarPublicaciones);
-    </script>
-
+    loadNovedades();
+  </script>
 </body>
-
 </html>
+
 
