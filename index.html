@@ -36,6 +36,8 @@
       transition: width 1s linear;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
 </head>
 <body class="text-gray-800">
 
@@ -252,66 +254,106 @@
   </script>
 
 <script>
+const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
+
+// --- Funciones auxiliares multimedia ---
+function esImagen(url) {
+  return !!url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url);
+}
+
+function convertirEnlaceYouTube(url) {
+  if (!url) return null;
+  url = String(url).trim();
+  let m = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/i);
+  if (m) return `https://www.youtube.com/embed/${m[1]}`;
+  m = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/i);
+  if (m) return `https://www.youtube.com/embed/${m[1]}`;
+  m = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/i);
+  if (m) return `https://www.youtube.com/embed/${m[1]}`;
+  m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/i);
+  if (m) return `https://www.youtube.com/embed/${m[1]}`;
+  return null;
+}
+
+function convertirSpotifyEnEmbed(url) {
+  if (!url) return null;
+  url = url.split("?")[0];
+  url = url.replace("/intl-es", "");
+  const match = url.match(/open\.spotify\.com\/(track|album|playlist)\/([a-zA-Z0-9]+)/);
+  if (match) return `https://open.spotify.com/embed/${match[1]}/${match[2]}`;
+  if (url.includes("embed")) return url;
+  return null;
+}
+
+// --- Cargar novedades desde la Sheet ---
 async function cargarNovedades() {
-  const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
+  const contenedor = document.getElementById("novedades");
+  if (!contenedor) return;
+  contenedor.innerHTML = "<p class='text-center text-gray-400'>Cargando novedades...</p>";
 
   try {
-    const response = await fetch(url);
-    const data = await response.text();
+    const response = await fetch(URL_SHEET);
+    const csvText = await response.text();
+    const data = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
 
-    // Dividir las filas y omitir encabezado
-    const rows = data.split("\n").slice(1);
-
-    // Convertir cada fila en un objeto
-    const novedades = rows.map(row => {
-      const columnas = row.split(",");
-      const [MarcaTemporal, Titulo, Contenido, Imagen, Video, Spotify, Fecha] = columnas;
-      return { MarcaTemporal, Titulo, Contenido, Imagen, Video, Spotify, Fecha };
-    }).filter(n => n.Titulo && n.Titulo.trim() !== ""); // evitar filas vacías
-
-    // Ordenar por fecha (de más nueva a más vieja)
-    novedades.sort((a, b) => new Date(b.Fecha) - new Date(a.Fecha));
-
-    const contenedor = document.getElementById("novedades");
     contenedor.innerHTML = "";
 
-    novedades.forEach(n => {
-      const card = document.createElement("div");
-      card.className = "bg-white rounded-2xl shadow border border-gray-200";
+    // Ordenar por fecha (más recientes primero)
+    data.sort((a, b) => new Date(b.Fecha) - new Date(a.Fecha));
 
-      // Mostrar solo un tipo de medio por prioridad: Imagen > Video > Spotify
-      let multimedia = "";
-      if (n.Imagen && n.Imagen.trim() !== "") {
-        multimedia = `<img src="${n.Imagen.trim()}" class="w-full h-64 object-cover rounded-t-2xl">`;
-      } else if (n.Video && n.Video.trim() !== "") {
-        // Ajustar si es un link de YouTube normal
-        let videoUrl = n.Video.trim();
-        if (videoUrl.includes("watch?v=")) {
-          videoUrl = videoUrl.replace("watch?v=", "embed/");
-        }
-        multimedia = `<iframe class="w-full h-64 rounded-t-2xl" src="${videoUrl}" frameborder="0" allowfullscreen></iframe>`;
-      } else if (n.Spotify && n.Spotify.trim() !== "") {
-        multimedia = `<iframe class="w-full h-20" src="${n.Spotify.trim()}" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+    data.forEach(row => {
+      const titulo = row.Titulo?.trim() || "Sin título";
+      const contenido = row.Contenido?.trim() || "";
+      const imagen = row.Imagen?.trim() || "";
+      const video = row.Video?.trim() || "";
+      const spotify = row.Spotify?.trim() || "";
+      const fecha = row.Fecha?.trim() || "";
+
+      // Crear card base
+      const card = document.createElement("div");
+      card.className = "bg-white rounded-2xl shadow border border-gray-200 overflow-hidden";
+
+      // Determinar contenido multimedia
+      let multimediaHTML = "";
+      if (esImagen(imagen)) {
+        multimediaHTML = `<img src="${imagen}" class="w-full h-64 object-cover rounded-t-2xl">`;
+      } else if (convertirEnlaceYouTube(video)) {
+        multimediaHTML = `
+          <iframe class="w-full h-64 rounded-t-2xl"
+            src="${convertirEnlaceYouTube(video)}"
+            frameborder="0"
+            allowfullscreen></iframe>`;
+      } else if (convertirSpotifyEnEmbed(spotify)) {
+        multimediaHTML = `
+          <iframe class="w-full h-20 rounded-t-2xl"
+            src="${convertirSpotifyEnEmbed(spotify)}"
+            frameborder="0"
+            allowtransparency="true"
+            allow="encrypted-media"></iframe>`;
       }
 
+      // Armar contenido HTML
       card.innerHTML = `
-        ${multimedia}
+        ${multimediaHTML}
         <div class="p-3">
-          <h2 class="font-semibold text-lg">${n.Titulo}</h2>
-          <p class="text-gray-600 text-sm mt-1">${n.Contenido}</p>
+          <h2 class="font-semibold text-lg">${titulo}</h2>
+          <p class="text-gray-600 text-sm mt-1">${contenido}</p>
           <div class="flex justify-between items-center mt-3">
-            <span class="text-xs text-gray-400">Publicado: ${n.Fecha}</span>
-            <button class="text-pink-600 text-sm" onclick="sharePost('${n.Titulo}')">Compartir</button>
+            <span class="text-xs text-gray-400">Publicado: ${fecha}</span>
+            <button class="text-pink-600 text-sm" onclick="sharePost('${titulo}')">Compartir</button>
           </div>
         </div>
       `;
+
       contenedor.appendChild(card);
     });
-  } catch (error) {
-    console.error("Error al cargar la hoja:", error);
+  } catch (err) {
+    console.error("Error al cargar la hoja:", err);
+    contenedor.innerHTML = "<p class='text-center text-red-500'>Error al cargar novedades.</p>";
   }
 }
 
+// --- Función de compartir ---
 function sharePost(titulo) {
   if (navigator.share) {
     navigator.share({
@@ -320,15 +362,14 @@ function sharePost(titulo) {
       url: window.location.href
     });
   } else {
-    alert("Tu navegador no soporta compartir");
+    alert("Tu navegador no soporta la función de compartir");
   }
 }
 
-window.addEventListener("DOMContentLoaded", cargarNovedades);
+document.addEventListener("DOMContentLoaded", cargarNovedades);
 </script>
 </body>
 </html>
-
 
 
 
