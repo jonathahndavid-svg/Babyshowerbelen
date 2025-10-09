@@ -221,11 +221,16 @@
             return null;
         }
 
-        function convertirSpotifyEnEmbed(url) {
+function convertirSpotifyEnEmbed(url) {
     if (!url) return null;
-    url = url.trim();
 
-    // Ejemplo de enlace: https://open.spotify.com/track/ID
+    // Limpiamos parámetros extra (como ?si=...)
+    url = url.split("?")[0];
+
+    // Eliminamos /intl-es si existe
+    url = url.replace("/intl-es", "");
+
+    // Extraemos tipo y ID
     const match = url.match(/open\.spotify\.com\/(track|album|playlist)\/([a-zA-Z0-9]+)/);
     if (match) {
         const tipo = match[1]; // track, album, playlist
@@ -233,7 +238,7 @@
         return `https://open.spotify.com/embed/${tipo}/${id}`;
     }
 
-    // Si es ya un embed, lo devolvemos
+    // Si ya es embed, lo devolvemos
     if (url.includes("embed")) return url;
 
     return null;
@@ -313,13 +318,22 @@
                         }
                     }
 
-                   // Spotify (columna spotify)
+                 // Spotify (columna spotify)
 if (row.spotify) {
     const spotifyEmbed = convertirSpotifyEnEmbed(row.spotify);
     if (spotifyEmbed) {
         const spDiv = document.createElement("div");
         spDiv.className = "mt-4";
-        spDiv.innerHTML = `<iframe style="border-radius:12px" src="${spotifyEmbed}" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+        spDiv.innerHTML = `
+            <iframe 
+                style="border-radius:12px" 
+                src="${spotifyEmbed}" 
+                width="100%" 
+                height="152" 
+                frameborder="0" 
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                loading="lazy">
+            </iframe>`;
         card.appendChild(spDiv);
     }
 }
