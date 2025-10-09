@@ -39,6 +39,19 @@
             position: relative;
             transition: opacity 0.5s ease, transform 0.5s ease;
         }
+
+        /* Tarjetas centradas y más angostas */
+        #lista-publicaciones {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        #lista-publicaciones > div {
+            width: 100%;
+            max-width: 500px;
+        }
     </style>
 </head>
 
@@ -93,11 +106,11 @@
         <!-- Transmisión + Publicaciones -->
         <div id="section-transmision" class="section-active bg-white p-4 rounded-xl shadow-md space-y-3">
             <h2 class="text-lg font-semibold text-center">🎥 Transmisión del domingo anterior</h2>
-           
+
             <!-- Publicaciones -->
             <div class="mt-6">
                 <h3 class="text-md font-semibold text-center mb-3">📰 Últimas Publicaciones</h3>
-                <div id="lista-publicaciones" class="space-y-3 text-gray-700 text-sm">
+                <div id="lista-publicaciones" class="text-gray-700 text-sm">
                     <p class="text-center text-gray-400">Cargando publicaciones...</p>
                 </div>
             </div>
@@ -181,7 +194,6 @@
             });
         });
 
-        // Sidebar toggle
         const menuBtn = document.getElementById("menuBtn");
         const sidebar = document.getElementById("sidebar");
         const closeSidebar = document.getElementById("closeSidebar");
@@ -189,7 +201,6 @@
         menuBtn.addEventListener("click", () => { sidebar.classList.toggle("translate-x-full"); });
         closeSidebar.addEventListener("click", () => { sidebar.classList.add("translate-x-full"); });
 
-        // Publicaciones
         const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
 
         function esImagen(url) {
@@ -207,114 +218,118 @@
             if (m) return `https://www.youtube.com/embed/${m[1]}`;
             m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/i);
             if (m) return `https://www.youtube.com/embed/${m[1]}`;
-            m = url.match(/([a-zA-Z0-9_-]{11})$/);
-            if (m) return `https://www.youtube.com/embed/${m[1]}`;
             return null;
         }
 
-async function cargarPublicaciones() {
-    const contenedor = document.getElementById("lista-publicaciones");
-    if (!contenedor) return;
-
-    contenedor.innerHTML = "<p class='text-center text-gray-400'>Cargando publicaciones...</p>";
-
-    try {
-        const response = await fetch(URL_SHEET);
-        if (!response.ok) throw new Error("No se pudo acceder a la hoja");
-
-        const csvText = await response.text();
-        const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
-
-        contenedor.innerHTML = "";
-
-        if (!parsed || parsed.length === 0) {
-            contenedor.innerHTML = "<p class='text-center text-gray-400'>No hay publicaciones todavía.</p>";
-            return;
+        function convertirSpotifyEnEmbed(url) {
+            if (!url) return null;
+            url = url.trim();
+            let match = url.match(/spotify\.com\/(track|album|playlist)\/([a-zA-Z0-9]+)/);
+            if (match) return `https://open.spotify.com/embed/${match[1]}/${match[2]}`;
+            return null;
         }
 
-        // Mostramos más recientes primero
-        parsed.reverse().forEach(rawRow => {
-            const row = {};
-            Object.keys(rawRow).forEach(k => {
-                const key = k ? k.trim().toLowerCase() : "";
-                row[key] = rawRow[k] ? String(rawRow[k]).trim() : "";
-            });
+        async function cargarPublicaciones() {
+            const contenedor = document.getElementById("lista-publicaciones");
+            if (!contenedor) return;
+            contenedor.innerHTML = "<p class='text-center text-gray-400'>Cargando publicaciones...</p>";
 
-            if (!row.titulo && !row.contenido) return;
+            try {
+                const response = await fetch(URL_SHEET);
+                if (!response.ok) throw new Error("No se pudo acceder a la hoja");
 
-            const card = document.createElement("div");
-            card.className = "p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm";
+                const csvText = await response.text();
+                const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
 
-            // Título
-            const h3 = document.createElement("h3");
-            h3.className = "font-semibold text-indigo-600 text-base";
-            h3.textContent = row.titulo || "Sin título";
-            card.appendChild(h3);
+                contenedor.innerHTML = "";
 
-            // Fecha
-            if (row.fecha) {
-                const f = document.createElement("p");
-                f.className = "text-xs text-gray-500 mt-2 text-left";
-                f.textContent = row.fecha;
-                card.appendChild(f);
-            }
-
-            // Imagen o video desde columna 'imagen'
-            if (row.imagen) {
-                const posibleVideoDesdeImagen = convertirEnlaceYouTube(row.imagen);
-                if (posibleVideoDesdeImagen) {
-                    const vidDiv = document.createElement("div");
-                    vidDiv.className = "mt-4";
-                    vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${posibleVideoDesdeImagen}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
-                    card.appendChild(vidDiv);
-                } else if (esImagen(row.imagen)) {
-                    const img = document.createElement("img");
-                    img.src = row.imagen;
-                    img.alt = row.titulo || "Imagen";
-                    img.className = "w-full mt-2 rounded-lg shadow-sm";
-                    img.loading = "lazy";
-                    card.appendChild(img);
+                if (!parsed || parsed.length === 0) {
+                    contenedor.innerHTML = "<p class='text-center text-gray-400'>No hay publicaciones todavía.</p>";
+                    return;
                 }
+
+                parsed.reverse().forEach(rawRow => {
+                    const row = {};
+                    Object.keys(rawRow).forEach(k => {
+                        const key = k ? k.trim().toLowerCase() : "";
+                        row[key] = rawRow[k] ? String(rawRow[k]).trim() : "";
+                    });
+
+                    if (!row.titulo && !row.contenido) return;
+
+                    const card = document.createElement("div");
+                    card.className = "p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm";
+
+                    // Título
+                    const h3 = document.createElement("h3");
+                    h3.className = "font-semibold text-indigo-600 text-base";
+                    h3.textContent = row.titulo || "Sin título";
+                    card.appendChild(h3);
+
+                    // Fecha
+                    if (row.fecha) {
+                        const f = document.createElement("p");
+                        f.className = "text-xs text-gray-500 mt-2 text-left";
+                        f.textContent = row.fecha;
+                        card.appendChild(f);
+                    }
+
+                    // Imagen o video desde columna 'imagen'
+                    if (row.imagen) {
+                        const posibleVideo = convertirEnlaceYouTube(row.imagen);
+                        if (posibleVideo) {
+                            const vidDiv = document.createElement("div");
+                            vidDiv.className = "mt-4";
+                            vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${posibleVideo}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
+                            card.appendChild(vidDiv);
+                        } else if (esImagen(row.imagen)) {
+                            const img = document.createElement("img");
+                            img.src = row.imagen;
+                            img.alt = row.titulo || "Imagen";
+                            img.className = "w-full mt-2 rounded-lg shadow-sm";
+                            img.loading = "lazy";
+                            card.appendChild(img);
+                        }
+                    }
+
+                    // Video (columna video)
+                    if (row.video) {
+                        const videoEmbed = convertirEnlaceYouTube(row.video);
+                        if (videoEmbed) {
+                            const vidDiv = document.createElement("div");
+                            vidDiv.className = "mt-4";
+                            vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${videoEmbed}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
+                            card.appendChild(vidDiv);
+                        }
+                    }
+
+                    // Spotify (columna spotify)
+                    if (row.spotify) {
+                        const spotifyEmbed = convertirSpotifyEnEmbed(row.spotify);
+                        if (spotifyEmbed) {
+                            const spDiv = document.createElement("div");
+                            spDiv.className = "mt-4";
+                            spDiv.innerHTML = `<iframe style="border-radius:12px" src="${spotifyEmbed}" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+                            card.appendChild(spDiv);
+                        }
+                    }
+
+                    // Contenido
+                    if (row.contenido) {
+                        const p = document.createElement("p");
+                        p.className = "mt-2 whitespace-pre-line text-gray-700";
+                        p.textContent = row.contenido;
+                        card.appendChild(p);
+                    }
+
+                    contenedor.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error(err);
+                contenedor.innerHTML = "<p class='text-center text-red-500'>Error al cargar publicaciones.</p>";
             }
-
-            // Video (columna video)
-            if (row.video) {
-                const videoEmbed = convertirEnlaceYouTube(row.video);
-                if (videoEmbed) {
-                    const vidDiv = document.createElement("div");
-                    vidDiv.className = "mt-4";
-                    vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${videoEmbed}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
-                    card.appendChild(vidDiv);
-                }
-            }
-
-            // Spotify (columna spotify)
-            if (row.spotify) {
-                const spotifyEmbed = convertirSpotifyEnEmbed(row.spotify);
-                if (spotifyEmbed) {
-                    const spDiv = document.createElement("div");
-                    spDiv.className = "mt-4";
-                    spDiv.innerHTML = `<iframe style="border-radius:12px" src="${spotifyEmbed}" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
-                    card.appendChild(spDiv);
-                }
-            }
-
-            // Contenido
-            if (row.contenido) {
-                const p = document.createElement("p");
-                p.className = "mt-2 whitespace-pre-line text-gray-700";
-                p.textContent = row.contenido;
-                card.appendChild(p);
-            }
-
-            contenedor.appendChild(card);
-        });
-
-    } catch (err) {
-        console.error(err);
-        contenedor.innerHTML = "<p class='text-center text-red-500'>Error al cargar publicaciones.</p>";
-    }
-}
+        }
 
         document.addEventListener("DOMContentLoaded", cargarPublicaciones);
     </script>
