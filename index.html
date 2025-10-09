@@ -24,7 +24,7 @@
             color: rgb(100, 109, 174);
         }
 
-        /* Smooth entry animation */
+        /* Animación de entrada suave */
         .section-hidden {
             opacity: 0;
             transform: translateX(50px);
@@ -40,47 +40,44 @@
             transition: opacity 0.5s ease, transform 0.5s ease;
         }
 
-        /* Scroll horizontal for events */
-        #eventos-scroll {
+        /* Tarjetas centradas y más angostas */
+        #lista-publicaciones {
             display: flex;
-            overflow-x: auto;
+            flex-direction: column;
+            align-items: center;
             gap: 1rem;
-            padding-bottom: 0.5rem;
         }
 
-        #eventos-scroll::-webkit-scrollbar {
-            height: 8px;
-        }
-
-        #eventos-scroll::-webkit-scrollbar-thumb {
-            background: #a5b4fc;
-            border-radius: 4px;
-        }
-
-        /* Card hover zoom */
-        .card-hover:hover {
-            transform: scale(1.03);
-            transition: transform 0.3s ease;
+        #lista-publicaciones>div {
+            width: 100%;
+            max-width: 500px;
         }
     </style>
 </head>
 
 <body class="flex flex-col h-screen">
 
-    <!-- Header / Ribón -->
+    <!-- Header -->
     <header class="flex items-center justify-between p-4 bg-white shadow-md">
         <div class="flex items-center space-x-2">
-            <img src="https://i.imgur.com/0y0y0y0.png" alt="Logo" class="h-10 w-10 rounded-full object-cover" />
-            <span class="font-bold text-xl text-indigo-600">Soy IBA</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span class="font-semibold">Iglesia Bíblica Antioquía</span>
         </div>
-        <button id="menuBtn" class="p-2 rounded hover:bg-indigo-100 text-2xl">☰</button>
+        <button id="menuBtn" class="p-2 rounded hover:bg-indigo-100">
+            ☰
+        </button>
     </header>
 
     <!-- Sidebar -->
     <aside id="sidebar"
         class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50 overflow-y-auto">
         <div class="flex justify-end p-2">
-            <button id="closeSidebar" class="p-2 text-gray-600 hover:text-red-500">✕</button>
+            <button id="closeSidebar" class="p-2 text-gray-600 hover:text-red-500">
+                ✕
+            </button>
         </div>
         <div class="p-4 space-y-4">
             <h2 class="text-lg font-bold">Misión</h2>
@@ -96,70 +93,120 @@
                 <li>Sábado 04:00 PM Pre Juveniles / 06:00 PM Jóvenes</li>
                 <li>Último martes 07:00 PM Oración</li>
             </ul>
+            <h2 class="text-lg font-bold">Recomendados</h2>
+            <p>Lecturas y música edificante.</p>
             <h2 class="text-lg font-bold">Contacto</h2>
             <p>Calle 38asur #38-34, Envigado<br>info@iglesiaiba.org</p>
         </div>
     </aside>
 
     <!-- Contenido principal -->
-    <main id="content" class="flex-1 overflow-y-auto p-4 pb-20 relative space-y-6">
+    <main id="content" class="flex-1 overflow-y-auto p-4 pb-20 relative space-y-4">
 
-        <!-- Próximos Eventos -->
-        <section id="proximos-eventos" class="section-active bg-white p-4 rounded-xl shadow-md">
-            <h2 class="text-lg font-semibold mb-2 text-center">📅 Próximos Eventos</h2>
-            <div id="eventos-scroll">
-                <!-- Tarjetas de ejemplo -->
-                <div class="min-w-[150px] bg-indigo-50 rounded-xl shadow-sm p-2 card-hover cursor-pointer">
-                    <img src="https://i.imgur.com/8Km9tLL.jpg" alt="Evento 1" class="rounded-xl w-full h-24 object-cover" />
-                    <p class="text-center font-semibold mt-1">01 Oct</p>
-                    <p class="text-center text-sm">Concierto</p>
-                </div>
-                <div class="min-w-[150px] bg-indigo-50 rounded-xl shadow-sm p-2 card-hover cursor-pointer">
-                    <img src="https://i.imgur.com/Z5Qxq3S.jpg" alt="Evento 2" class="rounded-xl w-full h-24 object-cover" />
-                    <p class="text-center font-semibold mt-1">05 Oct</p>
-                    <p class="text-center text-sm">Retiro</p>
-                </div>
-                <div class="min-w-[150px] bg-indigo-50 rounded-xl shadow-sm p-2 card-hover cursor-pointer">
-                    <img src="https://i.imgur.com/3JfMZ0x.jpg" alt="Evento 3" class="rounded-xl w-full h-24 object-cover" />
-                    <p class="text-center font-semibold mt-1">10 Oct</p>
-                    <p class="text-center text-sm">Seminario</p>
-                </div>
-                <div class="min-w-[150px] bg-indigo-50 rounded-xl shadow-sm p-2 card-hover cursor-pointer">
-                    <img src="https://i.imgur.com/jf5dXqF.jpg" alt="Evento 4" class="rounded-xl w-full h-24 object-cover" />
-                    <p class="text-center font-semibold mt-1">12 Oct</p>
-                    <p class="text-center text-sm">Campamento</p>
-                </div>
-                <div class="min-w-[150px] bg-indigo-50 rounded-xl shadow-sm p-2 card-hover cursor-pointer">
-                    <img src="https://i.imgur.com/B1z2F4P.jpg" alt="Evento 5" class="rounded-xl w-full h-24 object-cover" />
-                    <p class="text-center font-semibold mt-1">15 Oct</p>
-                    <p class="text-center text-sm">Encuentro Juvenil</p>
+        <!-- Transmisión + Publicaciones -->
+        <div id="section-transmision" class="section-active bg-white p-4 rounded-xl shadow-md space-y-3">
+            <h2 class="text-lg font-semibold text-center">✨Novedades</h2>
+
+            <!-- ✨Novedades -->
+            <div class="mt-6">
+                <!--<h3 class="text-md font-semibold text-center mb-3">✨Novedades </h3> -->
+                <div id="lista-publicaciones" class="text-gray-700 text-sm">
+                    <p class="text-center text-gray-400">Cargando novedades...</p>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Novedades estilo Instagram -->
-        <section id="novedades" class="section-active bg-white p-4 rounded-xl shadow-md">
-            <h2 class="text-lg font-semibold mb-4 text-center">✨ Novedades</h2>
-            <div id="lista-publicaciones" class="flex flex-col gap-4 text-gray-700">
-                <p class="text-center text-gray-400">Cargando novedades...</p>
-            </div>
-        </section>
+        <!-- Otras secciones -->
+        <div id="section-inscripciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">📝 Inscripciones y
+            anuncios</div>
+        <div id="section-donaciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">💳 Donaciones: <br> QR +
+            Nº Cuenta</div>
+        <div id="section-eco" class="section-hidden bg-white p-4 rounded-xl shadow-md">🌍 Grupos ECO: mapa o links</div>
+        <div id="section-recomendados" class="section-hidden bg-white p-4 rounded-xl shadow-md">⭐ Recomendados</div>
 
     </main>
+
+    <!-- Barra de navegación inferior -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-inner flex justify-around py-2">
+        <button class="nav-btn active flex flex-col items-center text-indigo-600" data-section="transmision">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h7a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
+            </svg>
+            <span class="text-xs">✨Novedades</span>
+        </button>
+        <button class="nav-btn flex flex-col items-center" data-section="inscripciones">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 20h9M12 4h9M4 9h16M4 15h16M4 21h16" />
+            </svg>
+            <span class="text-xs">Inscripciones</span>
+        </button>
+        <button class="nav-btn flex flex-col items-center" data-section="donaciones">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8c-1.104 0-2 .672-2 1.5S10.896 11 12 11s2 .672 2 1.5S13.104 14 12 14m0 0v1m0-7V7m0 10a5 5 0 100-10 5 5 0 000 10z" />
+            </svg>
+            <span class="text-xs">Donaciones</span>
+        </button>
+        <button class="nav-btn flex flex-col items-center" data-section="eco">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            <span class="text-xs">ECO</span>
+        </button>
+        <button class="nav-btn flex flex-col items-center" data-section="recomendados">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.905c.969 0 1.371 1.24.588 1.81l-3.97 2.884a1 1 0 00-.364 1.118l1.518 4.674c.3.921-.755 1.688-1.54 1.118l-3.97-2.884a1 1 0 00-1.176 0l-3.97 2.884c-.784.57-1.838-.197-1.539-1.118l1.518-4.674a1 1 0 00-.364-1.118L2.088 10.1c-.783-.57-.38-1.81.588-1.81h4.905a1 1 0 00.95-.69l1.518-4.674z" />
+            </svg>
+            <span class="text-xs">Recomendados</span>
+        </button>
+    </nav>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <script>
-        // Sidebar
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const sections = document.querySelectorAll('main > div');
+
+        navButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                navButtons.forEach(b => b.classList.remove('text-indigo-600', 'active'));
+                btn.classList.add('text-indigo-600', 'active');
+
+                const target = "section-" + btn.dataset.section;
+                sections.forEach(sec => {
+                    if (sec.id === target) {
+                        sec.classList.remove('section-hidden');
+                        sec.classList.add('section-active');
+                    } else {
+                        sec.classList.remove('section-active');
+                        sec.classList.add('section-hidden');
+                    }
+                });
+            });
+        });
+
         const menuBtn = document.getElementById("menuBtn");
         const sidebar = document.getElementById("sidebar");
         const closeSidebar = document.getElementById("closeSidebar");
+
         menuBtn.addEventListener("click", () => { sidebar.classList.toggle("translate-x-full"); });
         closeSidebar.addEventListener("click", () => { sidebar.classList.add("translate-x-full"); });
 
-        // Funciones utilitarias
         const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
-        function esImagen(url) { return !!url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url); }
+
+        function esImagen(url) {
+            return !!url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url);
+        }
+
         function convertirEnlaceYouTube(url) {
             if (!url) return null;
             url = String(url).trim();
@@ -173,12 +220,27 @@
             if (m) return `https://www.youtube.com/embed/${m[1]}`;
             return null;
         }
+
         function convertirSpotifyEnEmbed(url) {
             if (!url) return null;
-            url = url.split("?")[0].replace("/intl-es", "");
+
+            // Limpiamos parámetros extra (como ?si=...)
+            url = url.split("?")[0];
+
+            // Eliminamos /intl-es si existe
+            url = url.replace("/intl-es", "");
+
+            // Extraemos tipo y ID
             const match = url.match(/open\.spotify\.com\/(track|album|playlist)\/([a-zA-Z0-9]+)/);
-            if (match) return `https://open.spotify.com/embed/${match[1]}/${match[2]}`;
+            if (match) {
+                const tipo = match[1]; // track, album, playlist
+                const id = match[2];
+                return `https://open.spotify.com/embed/${tipo}/${id}`;
+            }
+
+            // Si ya es embed, lo devolvemos
             if (url.includes("embed")) return url;
+
             return null;
         }
 
@@ -193,7 +255,9 @@
 
                 const csvText = await response.text();
                 const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
+
                 contenedor.innerHTML = "";
+
                 if (!parsed || parsed.length === 0) {
                     contenedor.innerHTML = "<p class='text-center text-gray-400'>No hay publicaciones todavía.</p>";
                     return;
@@ -205,64 +269,117 @@
                         const key = k ? k.trim().toLowerCase() : "";
                         row[key] = rawRow[k] ? String(rawRow[k]).trim() : "";
                     });
+
                     if (!row.titulo && !row.contenido) return;
 
                     const card = document.createElement("div");
-                    card.className = "bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex flex-col gap-2 card-hover";
+                    card.className = "p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm";
 
-                    // Header con perfil
-                    const header = document.createElement("div");
-                    header.className = "flex items-center gap-2";
-                    const perfil = document.createElement("img");
-                    perfil.src = row.foto || "https://i.imgur.com/0y0y0y0.png";
-                    perfil.alt = "Perfil";
-                    perfil.className = "w-10 h-10 rounded-full object-cover";
-                    const nombre = document.createElement("div");
-                    nombre.innerHTML = `<p class="font-semibold text-indigo-600 text-sm">${row.nombre || "Soy IBA"}</p>
-                                        <p class="text-xs text-gray-400">${row.fecha || ""}</p>`;
-                    header.appendChild(perfil);
-                    header.appendChild(nombre);
-                    card.appendChild(header);
-
-                    // Titulo
-                    if (row.titulo) {
-                        const t = document.createElement("h3");
-                        t.className = "font-semibold text-base mt-2";
-                        t.textContent = row.titulo;
-                        card.appendChild(t);
+                    // Fecha
+                    if (row.fecha) {
+                        const f = document.createElement("p");
+                        f.className = "text-xs text-gray-500 mt-2 text-right";
+                        f.textContent = row.fecha;
+                        card.appendChild(f);
                     }
+
+                    // Título
+                    const h3 = document.createElement("h3");
+                    h3.className = "font-semibold text-indigo-600 text-base";
+                    h3.textContent = row.titulo || "Sin título";
+                    card.appendChild(h3);
 
                     // Contenido
                     if (row.contenido) {
-                        const c = document.createElement("p");
-                        c.className = "text-sm text-gray-700 whitespace-pre-line";
-                        c.textContent = row.contenido;
-                        card.appendChild(c);
+                        const p = document.createElement("p");
+                        p.className = "mt-2 whitespace-pre-line text-gray-700";
+                        p.textContent = row.contenido;
+                        card.appendChild(p);
                     }
 
-                    // Imagen
-                    if (row.imagen && esImagen(row.imagen)) {
-                        const img = document.createElement("img");
-                        img.src = row.imagen;
-                        img.alt = row.titulo || "Imagen";
-                        img.className = "w-full rounded-xl mt-2 cursor-pointer";
-                        img.addEventListener("click", () => window.open(row.imagen, "_blank"));
-                        card.appendChild(img);
+
+                    // Imagen o video desde columna 'imagen'
+                    if (row.imagen) {
+                        const posibleVideo = convertirEnlaceYouTube(row.imagen);
+                        if (posibleVideo) {
+                            const vidDiv = document.createElement("div");
+                            vidDiv.className = "mt-4";
+                            vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${posibleVideo}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
+                            card.appendChild(vidDiv);
+                        } else if (esImagen(row.imagen)) {
+                            const img = document.createElement("img");
+                            img.src = row.imagen;
+                            img.alt = row.titulo || "Imagen";
+                            img.className = "w-full mt-2 rounded-lg shadow-sm";
+                            img.loading = "lazy";
+                            card.appendChild(img);
+                        }
                     }
 
-                    // Compartir
+                    // Video (columna video)
+                    if (row.video) {
+                        const videoEmbed = convertirEnlaceYouTube(row.video);
+                        if (videoEmbed) {
+                            const vidDiv = document.createElement("div");
+                            vidDiv.className = "mt-4";
+                            vidDiv.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${videoEmbed}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
+                            card.appendChild(vidDiv);
+                        }
+                    }
+
+                    // Spotify (columna spotify)
+                    if (row.spotify) {
+                        const spotifyEmbed = convertirSpotifyEnEmbed(row.spotify);
+                        if (spotifyEmbed) {
+                            const spDiv = document.createElement("div");
+                            spDiv.className = "mt-4";
+                            spDiv.innerHTML = `
+            <iframe 
+                style="border-radius:12px" 
+                src="${spotifyEmbed}" 
+                width="100%" 
+                height="152" 
+                frameborder="0" 
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                loading="lazy">
+            </iframe>`;
+                            card.appendChild(spDiv);
+                        }
+                    }
+
+
+
+                    // Botón Compartir WhatsApp elegante
                     const shareBtn = document.createElement("button");
-                    shareBtn.className = "mt-2 px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm flex items-center justify-center gap-1";
-                    shareBtn.textContent = "📤 Compartir";
+                    shareBtn.className = "mt-3 px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm flex items-center justify-center gap-1";
+                    shareBtn.innerHTML = "📤 Compartir WhatsApp";
+
                     shareBtn.addEventListener("click", () => {
+                        // Construir mensaje dinámicamente
                         let mensaje = `*${row.titulo || "Sin título"}*\n\n`;
+
                         if (row.contenido) mensaje += `${row.contenido}\n\n`;
                         if (row.imagen) mensaje += `Imagen: ${row.imagen}\n`;
-                        mensaje += `\n_Compartido desde SoyIBA_`;
+                        if (row.video) mensaje += `Video: ${row.video}\n`;
+                        if (row.spotify) mensaje += `Spotify: ${row.spotify}\n`;
+
+                        mensaje += `\n_Compartido desde SoyIBA_\nhttps://jonathahndavid-svg.github.io/Babyshowerbelen/index.html`;
+
+                        // Codificar mensaje para URL
                         const url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(mensaje);
+
+                        // Abrir WhatsApp en nueva ventana
                         window.open(url, "_blank");
                     });
-                    card.appendChild(shareBtn);
+
+                    // Añadir al card antes de la fecha
+                    const fechaElemento = card.querySelector(".text-xs.text-gray-500");
+                    if (fechaElemento) {
+                        card.insertBefore(shareBtn, fechaElemento);
+                    } else {
+                        card.appendChild(shareBtn);
+                    }
+
 
                     contenedor.appendChild(card);
                 });
