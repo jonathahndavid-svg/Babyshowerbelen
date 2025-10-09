@@ -1,237 +1,322 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Soy IBA</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
     body {
-      background: radial-gradient(circle at 20% 20%, #e5d9f2, transparent 30%),
-        radial-gradient(circle at 80% 25%, #d0e1fa, transparent 30%),
-        radial-gradient(circle at 40% 80%, #c8f6f9, transparent 30%),
-        radial-gradient(circle at 70% 90%, #ffe6e6, transparent 30%),
-        #f3f7fb;
-      font-family: system-ui, sans-serif;
-      color: rgb(100, 109, 174);
+      font-family: 'Inter', sans-serif;
+      background-color: #fafafa;
     }
 
-    .event-card {
-      border: 2px solid #a8b4f9;
-      border-radius: 9999px;
-      overflow: hidden;
-      min-width: 80px;
-      height: 80px;
-      flex-shrink: 0;
-      background: white;
+    /* Gradiente tipo Instagram */
+    .insta-gradient {
+      background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
     }
 
-    .event-card img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 50%;
+    /* Modal visible */
+    .story-active {
+      display: flex !important;
     }
 
-    #eventModal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.8);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 50;
+    /* Animación fade */
+    .fade {
+      animation: fadein 0.5s;
     }
 
-    #eventModal.active {
-      display: flex;
+    @keyframes fadein {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
-    #eventContent {
-      position: relative;
-      width: 90%;
-      max-width: 400px;
-      height: 90%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      color: white;
-    }
-
-    #eventContent img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 0;
-    }
-
-    #eventInfo {
-      position: relative;
-      z-index: 1;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
-      padding: 1rem;
-      border-radius: 0 0 1rem 1rem;
-    }
-
-    #closeEvent {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: bold;
-      cursor: pointer;
-      color: #444;
-    }
-
-    #countdown {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      background: rgba(255, 255, 255, 0.8);
-      color: #444;
-      font-size: 12px;
-      border-radius: 12px;
-      padding: 2px 6px;
+    /* Barra de progreso */
+    .progress-bar {
+      transition: width 1s linear;
     }
   </style>
 </head>
+<body class="text-gray-800">
 
-<body class="flex flex-col min-h-screen">
-
-  <!-- Ribon superior -->
-  <header class="flex items-center justify-between p-4 bg-white shadow-md">
-    <h1 class="font-semibold text-indigo-600 text-lg">Soy IBA</h1>
-    <button class="p-2 text-indigo-500 text-xl">☰</button>
+  <!-- RIBBON SUPERIOR -->
+  <header class="flex items-center justify-between p-4 bg-white shadow">
+    <h1 class="text-2xl font-bold text-pink-600">Soy IBA</h1>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+    </svg>
   </header>
 
-  <main class="flex-1 overflow-y-auto p-4 space-y-6">
+  <!-- EVENTOS -->
+  <section class="p-3 overflow-x-auto flex gap-4">
+    <div class="flex gap-4">
+      <div class="flex-shrink-0 text-center cursor-pointer" onclick="openStory(0)">
+        <div class="p-[2px] rounded-full insta-gradient">
+          <img src="https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=200" class="w-20 h-20 rounded-full object-cover border-2 border-white">
+        </div>
+        <p class="text-xs mt-1">Concierto </p>
+      </div>
 
-    <!-- Eventos -->
-    <section>
-      <h2 class="text-lg font-semibold mb-2">🎉 Eventos</h2>
-      <div id="eventos" class="flex space-x-3 overflow-x-auto pb-2"></div>
-    </section>
+      <div class="flex-shrink-0 text-center cursor-pointer" onclick="openStory(1)">
+        <div class="p-[2px] rounded-full insta-gradient">
+          <img src="https://images.unsplash.com/photo-1551836022-4c4c79ecde51?w=200" class="w-20 h-20 rounded-full object-cover border-2 border-white">
+        </div>
+        <p class="text-xs mt-1">Reunión</p>
+      </div>
 
-    <!-- Novedades -->
-    <section>
-      <h2 class="text-lg font-semibold mb-2">✨ Novedades</h2>
-      <div id="novedades" class="flex flex-col items-center gap-4"></div>
-    </section>
+      <div class="flex-shrink-0 text-center cursor-pointer" onclick="openStory(2)">
+        <div class="p-[2px] rounded-full insta-gradient">
+          <img src="https://images.unsplash.com/photo-1535930749574-1399327ce78f?w=200" class="w-20 h-20 rounded-full object-cover border-2 border-white">
+        </div>
+        <p class="text-xs mt-1">Domingo</p>
+      </div>
+    </div>
+  </section>
+  <!--Novedades de sheet-->
+<section id="novedades" class="p-4 space-y-6"></section>
 
-  </main>
+  <!-- NOVEDADES -->
+  <section class="p-4 space-y-6">
+    <div class="bg-white rounded-2xl shadow">
+      <img src="https://images.unsplash.com/photo-1497493292307-31c376b6e479?w=800" class="w-full h-64 object-cover rounded-t-2xl">
+      <div class="p-3">
+        <h2 class="font-semibold text-lg">Transmisión en vivo 🎥</h2>
+        <p class="text-gray-600 text-sm mt-1">Disfruta del mensaje del domingo a las 10 AM.</p>
+        <div class="flex justify-between items-center mt-3">
+          <span class="text-xs text-gray-400">Publicado: 9 oct 2025</span>
+          <button class="text-pink-600 text-sm" onclick="sharePost('Transmisión en vivo')">Compartir</button>
+        </div>
+      </div>
+    </div>
 
-  <!-- Modal Eventos -->
-  <div id="eventModal">
-    <div id="eventContent">
-      <div id="countdown">5</div>
-      <div id="closeEvent">✕</div>
-      <img id="eventImage" src="" alt="">
-      <div id="eventInfo">
-        <h3 id="eventTitle" class="text-lg font-semibold"></h3>
-        <p id="eventDesc" class="text-sm opacity-90"></p>
-        <button id="shareEvent"
-          class="mt-2 bg-green-500 text-white px-3 py-1 text-xs rounded-lg float-right">📤</button>
+    <div class="bg-white rounded-2xl shadow">
+      <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800" class="w-full h-64 object-cover rounded-t-2xl">
+      <div class="p-3">
+        <h2 class="font-semibold text-lg">Noche de Alabanza ✨</h2>
+        <p class="text-gray-600 text-sm mt-1">Únete a nosotros para una noche de adoración y música.</p>
+        <div class="flex justify-between items-center mt-3">
+          <span class="text-xs text-gray-400">Publicado: 7 oct 2025</span>
+          <button class="text-pink-600 text-sm" onclick="sharePost('Noche de Alabanza')">Compartir</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORY MODAL -->
+  <div id="storyModal" class="hidden fixed inset-0 bg-black bg-opacity-90 justify-center items-center z-50">
+    <!-- X SIEMPRE VISIBLE -->
+    <button onclick="closeStory()" class="absolute top-4 right-4 text-white text-3xl font-bold z-50">×</button>
+
+    <!-- Barra de progreso y contador -->
+    <div class="absolute top-0 left-0 w-full px-6 pt-5 z-40">
+      <div class="h-1 bg-gray-500 rounded-full overflow-hidden">
+        <div id="progressBar" class="h-1 bg-pink-500 progress-bar" style="width:0%"></div>
+      </div>
+      <p id="countdown" class="text-white text-sm mt-1 text-right">5s</p>
+    </div>
+
+    <div class="relative w-full h-full flex items-center justify-center">
+      <div id="storyContent" class="relative w-full h-full flex items-center justify-center fade">
+        <img id="storyImage" src="" class="object-cover w-full h-full">
+        <div class="absolute bottom-0 w-full bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
+          <h2 id="storyTitle" class="text-xl font-bold"></h2>
+          <p id="storyDesc" class="text-sm"></p>
+          <button id="shareBtn" onclick="shareStory()" class="absolute bottom-6 right-6 text-white bg-pink-500 rounded-full p-2 text-xs">🔗</button>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
+    const stories = [
+      {
+        img: "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=1080",
+        title: "Concierto de Fe",
+        desc: "Una noche llena de música y esperanza."
+      },
+      {
+        img: "https://images.unsplash.com/photo-1551836022-4c4c79ecde51?w=1080",
+        title: "Reunión de líderes",
+        desc: "Creciendo juntos en propósito."
+      },
+      {
+        img: "https://images.unsplash.com/photo-1535930749574-1399327ce78f?w=1080",
+        title: "Domingo de adoración",
+        desc: "Ven y comparte con nosotros."
+      }
+    ];
 
-    let eventos = [], novedades = [];
-    let currentIndex = 0, countdownInterval = null, timeLeft = 5;
+    let currentStory = 0;
+    let autoAdvance;
+    let countdownInterval;
+    const duration = 5; // segundos
+    let remaining = duration;
 
-    async function cargarDatos() {
-      const res = await fetch(SHEET_URL);
-      const csv = await res.text();
-      const data = Papa.parse(csv, { header: true, skipEmptyLines: true }).data;
-
-      eventos = data.filter(d => d.Tipo?.toLowerCase() === "evento");
-      novedades = data.filter(d => d.Tipo?.toLowerCase() === "novedad").reverse();
-
-      renderEventos();
-      renderNovedades();
+    function showStory(index) {
+      currentStory = index;
+      const story = stories[index];
+      document.getElementById("storyImage").src = story.img;
+      document.getElementById("storyTitle").innerText = story.title;
+      document.getElementById("storyDesc").innerText = story.desc;
+      resetProgress();
     }
 
-    function renderEventos() {
-      const cont = document.getElementById("eventos");
-      cont.innerHTML = "";
-      eventos.forEach((ev, i) => {
-        const card = document.createElement("div");
-        card.className = "event-card cursor-pointer";
-        card.innerHTML = `<img src="${ev.Imagen}" alt="${ev.Titulo}">`;
-        card.addEventListener("click", () => abrirEvento(i));
-        cont.appendChild(card);
-      });
+    function openStory(index) {
+      const modal = document.getElementById("storyModal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      showStory(index);
+      startAutoAdvance();
     }
 
-    function renderNovedades() {
-      const cont = document.getElementById("novedades");
-      cont.innerHTML = "";
-      novedades.forEach(nov => {
-        const card = document.createElement("div");
-        card.className = "bg-white border border-gray-200 rounded-xl shadow-sm p-4 max-w-md w-full";
-        card.innerHTML = `
-          <h3 class="font-semibold text-indigo-600">${nov.Titulo}</h3>
-          <p class="text-sm mt-1">${nov.Contenido || ""}</p>
-          ${nov.Imagen ? `<img src="${nov.Imagen}" class="rounded-lg mt-2">` : ""}
-          <p class="text-xs text-gray-500 mt-2">${nov.Fecha || ""}</p>
-          <button class="mt-2 px-3 py-1 bg-green-500 text-white rounded-lg text-xs">📤 Compartir</button>
-        `;
-        cont.appendChild(card);
-      });
-    }
-
-    function abrirEvento(index) {
-      currentIndex = index;
-      const modal = document.getElementById("eventModal");
-      const data = eventos[index];
-      document.getElementById("eventImage").src = data.Imagen;
-      document.getElementById("eventTitle").textContent = data.Titulo;
-      document.getElementById("eventDesc").textContent = data.Contenido;
-      modal.classList.add("active");
-      iniciarCuentaRegresiva();
-    }
-
-    function iniciarCuentaRegresiva() {
+    function closeStory() {
+      const modal = document.getElementById("storyModal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      clearInterval(autoAdvance);
       clearInterval(countdownInterval);
-      timeLeft = 5;
-      document.getElementById("countdown").textContent = timeLeft;
+      resetProgress(true);
+    }
+
+    function nextStory() {
+      currentStory = (currentStory + 1) % stories.length;
+      showStory(currentStory);
+    }
+
+    function startAutoAdvance() {
+      clearInterval(autoAdvance);
+      clearInterval(countdownInterval);
+      remaining = duration;
+      updateCountdown();
+
       countdownInterval = setInterval(() => {
-        timeLeft--;
-        document.getElementById("countdown").textContent = timeLeft;
-        if (timeLeft <= 0) siguienteEvento();
+        remaining--;
+        updateCountdown();
+        if (remaining <= 0) {
+          nextStory();
+        }
+      }, 1000);
+
+      let progress = 0;
+      const progressBar = document.getElementById("progressBar");
+      progressBar.style.width = "0%";
+
+      autoAdvance = setInterval(() => {
+        progress += 20; // cada segundo equivale al 20%
+        progressBar.style.width = progress + "%";
+        if (progress >= 100) {
+          progress = 0;
+          progressBar.style.width = "0%";
+        }
       }, 1000);
     }
 
-    function siguienteEvento() {
-      clearInterval(countdownInterval);
-      currentIndex = (currentIndex + 1) % eventos.length;
-      abrirEvento(currentIndex);
+    function resetProgress(clear = false) {
+      const progressBar = document.getElementById("progressBar");
+      progressBar.style.width = clear ? "0%" : "100%";
+      remaining = duration;
+      updateCountdown();
     }
 
-    document.getElementById("eventModal").addEventListener("click", siguienteEvento);
-    document.getElementById("closeEvent").addEventListener("click", e => {
-      e.stopPropagation();
-      document.getElementById("eventModal").classList.remove("active");
-      clearInterval(countdownInterval);
-    });
+    function updateCountdown() {
+      document.getElementById("countdown").innerText = remaining + "s";
+    }
 
-    document.addEventListener("DOMContentLoaded", cargarDatos);
+    function shareStory() {
+      const story = stories[currentStory];
+      if (navigator.share) {
+        navigator.share({
+          title: story.title,
+          text: story.desc,
+          url: window.location.href
+        });
+      } else {
+        alert("Tu navegador no soporta compartir.");
+      }
+    }
+
+    function sharePost(title) {
+      if (navigator.share) {
+        navigator.share({
+          title: title,
+          url: window.location.href
+        });
+      } else {
+        alert("Tu navegador no soporta compartir.");
+      }
+    }
+
+    
+
+    
   </script>
 
-</body>
+  <script>
+async function cargarNovedades() {
+  const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
 
+  try {
+    const response = await fetch(url);
+    const data = await response.text();
+    const rows = data.split("\n").slice(1); // omite encabezados
+    const novedades = rows.map(row => {
+      const [Titulo, Contenido, Imagen, Video, Spotify, Fecha] = row.split(",");
+      return { Titulo, Contenido, Imagen, Video, Spotify, Fecha };
+    }).filter(n => n.Titulo); // evitar filas vacías
+
+    // Ordenar por fecha (de más nueva a más vieja)
+    novedades.sort((a, b) => new Date(b.Fecha) - new Date(a.Fecha));
+
+    const contenedor = document.getElementById("novedades");
+    contenedor.innerHTML = "";
+
+    novedades.forEach(n => {
+      const card = document.createElement("div");
+      card.className = "bg-white rounded-2xl shadow border border-gray-200";
+
+      let multimedia = "";
+      if (n.Imagen) {
+        multimedia = `<img src="${n.Imagen.trim()}" class="w-full h-64 object-cover rounded-t-2xl">`;
+      } else if (n.Video) {
+        multimedia = `<iframe class="w-full h-64 rounded-t-2xl" src="${n.Video.trim()}" frameborder="0" allowfullscreen></iframe>`;
+      } else if (n.Spotify) {
+        multimedia = `<iframe class="w-full h-20" src="${n.Spotify.trim()}" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+      }
+
+      card.innerHTML = `
+        ${multimedia}
+        <div class="p-3">
+          <h2 class="font-semibold text-lg">${n.Titulo}</h2>
+          <p class="text-gray-600 text-sm mt-1">${n.Contenido}</p>
+          <div class="flex justify-between items-center mt-3">
+            <span class="text-xs text-gray-400">Publicado: ${n.Fecha}</span>
+            <button class="text-pink-600 text-sm" onclick="sharePost('${n.Titulo}')">Compartir</button>
+          </div>
+        </div>
+      `;
+      contenedor.appendChild(card);
+    });
+  } catch (error) {
+    console.error("Error al cargar la hoja:", error);
+  }
+}
+
+function sharePost(titulo) {
+  if (navigator.share) {
+    navigator.share({
+      title: titulo,
+      text: "Mira esta novedad:",
+      url: window.location.href
+    });
+  } else {
+    alert("Tu navegador no soporta compartir");
+  }
+}
+
+window.addEventListener("DOMContentLoaded", cargarNovedades);
+</script>
+</body>
 </html>
+
 
 
