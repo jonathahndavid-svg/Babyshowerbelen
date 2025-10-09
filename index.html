@@ -222,12 +222,22 @@
         }
 
         function convertirSpotifyEnEmbed(url) {
-            if (!url) return null;
-            url = url.trim();
-            let match = url.match(/spotify\.com\/(track|album|playlist)\/([a-zA-Z0-9]+)/);
-            if (match) return `https://open.spotify.com/embed/${match[1]}/${match[2]}`;
-            return null;
-        }
+    if (!url) return null;
+    url = url.trim();
+
+    // Ejemplo de enlace: https://open.spotify.com/track/ID
+    const match = url.match(/open\.spotify\.com\/(track|album|playlist)\/([a-zA-Z0-9]+)/);
+    if (match) {
+        const tipo = match[1]; // track, album, playlist
+        const id = match[2];
+        return `https://open.spotify.com/embed/${tipo}/${id}`;
+    }
+
+    // Si es ya un embed, lo devolvemos
+    if (url.includes("embed")) return url;
+
+    return null;
+}
 
         async function cargarPublicaciones() {
             const contenedor = document.getElementById("lista-publicaciones");
