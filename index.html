@@ -134,7 +134,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h7a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
             </svg>
-            <span class="text-xs">Transmisión</span>
+            <span class="text-xs">✨Novedades</span>
         </button>
         <button class="nav-btn flex flex-col items-center" data-section="inscripciones">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -347,6 +347,40 @@
                         f.textContent = row.fecha;
                         card.appendChild(f);
                     }
+
+
+                    // Botón Compartir WhatsApp
+                    const shareBtn = document.createElement("button");
+                    shareBtn.className = "mt-3 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm flex items-center justify-center";
+                    shareBtn.textContent = "📤 Compartir WhatsApp";
+
+                    shareBtn.addEventListener("click", () => {
+                        // Construir mensaje
+                        let mensaje = `*${row.titulo || "Sin título"}*\n\n`;
+
+                        if (row.contenido) mensaje += `${row.contenido}\n\n`;
+
+                        // Imagen
+                        if (row.imagen) mensaje += `Imagen: ${row.imagen}\n`;
+
+                        // Video
+                        if (row.video) mensaje += `Video: ${row.video}\n`;
+
+                        // Spotify
+                        if (row.spotify) mensaje += `Spotify: ${row.spotify}\n`;
+
+                        mensaje += `\n_Compartido desde SoyIBA_\nhttps://jonathahndavid-svg.github.io/Babyshowerbelen/index.html`;
+
+                        // Codificar para URL
+                        const url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(mensaje);
+
+                        // Abrir en nueva ventana
+                        window.open(url, "_blank");
+                    });
+
+                    // Añadir al card, preferiblemente antes de la fecha
+                    card.appendChild(shareBtn);
+
 
                     contenedor.appendChild(card);
                 });
