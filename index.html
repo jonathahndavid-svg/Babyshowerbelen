@@ -1,57 +1,58 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Soy IBA - Novedades</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="icon" href="icon.png" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Publicaciones y Eventos</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
-body { background: #f3f7fb; font-family: sans-serif; margin:0; }
-.section-hidden { display:none; opacity:0; transform:translateX(50px); transition:0.5s;}
-.section-active { display:block; opacity:1; transform:translateX(0); transition:0.5s;}
-#lista-publicaciones>div { max-width:500px; margin:auto; }
+  body{font-family:sans-serif;margin:0;padding:0;background:#f5f5f5}
+  .section-title{font-size:1.2rem;font-weight:600;margin-bottom:0.5rem}
+  .card{background:white;border-radius:1rem;padding:1rem;box-shadow:0 2px 5px rgba(0,0,0,0.1);border:1px solid #e0e0e0;cursor:pointer;transition:transform 0.2s;position:relative}
+  .card:hover{transform:scale(1.03)}
+  .card img{width:100%;border-radius:0.5rem;margin-bottom:0.5rem;object-fit:cover}
+  .flex-scroll{display:flex;overflow-x:auto;gap:1rem;padding-bottom:0.5rem}
+  .flex-scroll::-webkit-scrollbar{display:none}
+  .modal-bg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;justify-content:center;align-items:center;z-index:1000}
+  .modal{background:white;border-radius:1rem;padding:1.5rem;max-width:600px;width:90%;max-height:90%;overflow-y:auto;position:relative}
+  .modal-close{position:absolute;top:10px;right:15px;font-size:1.5rem;cursor:pointer;color:#555}
+  .btn-share{margin-top:1rem;padding:0.5rem 1rem;background:#25d366;color:white;border:none;border-radius:0.5rem;cursor:pointer;width:100%;font-size:0.9rem}
+  iframe{border-radius:12px;margin-bottom:0.5rem}
 </style>
 </head>
-<body class="bg-gray-50">
+<body>
 
-<!-- Header -->
-<header class="sticky top-0 bg-white/80 backdrop-blur-md border-b border-gray-200 p-4 flex justify-between items-center shadow-sm z-50">
-  <div class="flex items-center gap-2">
-    <img src="https://i.imgur.com/41xX3kW.png" class="w-8 h-8 rounded-full" alt="logo">
-    <h1 class="text-lg font-bold">Soy IBA</h1>
-  </div>
-  <button id="menuBtn" class="p-2 rounded-full hover:bg-gray-100">☰</button>
-</header>
-
-<!-- Sidebar -->
-<aside id="sidebar" class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50 overflow-y-auto p-4">
-  <button id="closeSidebar" class="p-2 text-gray-600 hover:text-red-500 mb-4">✕</button>
-  <p>Misión, Visión, Horarios, Contacto...</p>
-</aside>
-
-<!-- ...mantiene todo lo anterior hasta sección de eventos... -->
-<!-- Eventos próximos -->
+<!-- Eventos -->
 <section class="px-4 mt-4">
-  <h2 class="text-lg font-semibold mb-2">📅 Próximos eventos</h2>
-  <div class="flex overflow-x-auto gap-3 pb-2 no-scrollbar" id="eventContainer">
+  <h2 class="section-title">📅 Próximos eventos</h2>
+  <div id="eventContainer" class="flex-scroll">
     <p class="text-gray-400">Cargando eventos...</p>
   </div>
 </section>
 
-<!-- Novedades dinámicas -->
-<main class="p-4 space-y-6 mt-4">
-  <h2 class="text-lg font-bold mb-4">✨ Novedades</h2>
+<!-- Novedades -->
+<main class="p-4 mt-6">
+  <h2 class="section-title">✨ Novedades</h2>
   <div id="lista-publicaciones">
-    <p class="text-center text-gray-400">Cargando novedades...</p>
+    <p class="text-gray-400">Cargando novedades...</p>
   </div>
 </main>
+
+<!-- Modal -->
+<div id="modal" class="modal-bg">
+  <div class="modal">
+    <span class="modal-close">&times;</span>
+    <div id="modal-content"></div>
+    <button id="share-btn" class="btn-share">📤 Compartir WhatsApp</button>
+  </div>
+</div>
 
 <script>
 const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
 
+// Helpers
 function esImagen(url){ return !!url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url); }
-function convertirEnlaceYouTube(url){ 
+function convertirYouTube(url){
   if(!url) return null;
   let m = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/i);
   if(m) return `https://www.youtube.com/embed/${m[1]}`;
@@ -61,7 +62,7 @@ function convertirEnlaceYouTube(url){
   if(m) return `https://www.youtube.com/embed/${m[1]}`;
   return null;
 }
-function convertirSpotifyEnEmbed(url){
+function convertirSpotify(url){
   if(!url) return null;
   url = url.split("?")[0].replace("/intl-es","");
   const match = url.match(/open\.spotify\.com\/(track|album|playlist)\/([a-zA-Z0-9]+)/);
@@ -69,26 +70,29 @@ function convertirSpotifyEnEmbed(url){
   return url.includes("embed")?url:null;
 }
 
-// Compartir WhatsApp
-function crearBotonCompartir(titulo, contenido, imagen, video, spotify){
-  const btn = document.createElement("button");
-  btn.textContent="📤 Compartir WhatsApp";
-  btn.className="mt-3 px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm w-full";
-  btn.addEventListener("click",()=>{
-    let msg=`*${titulo}*\n${contenido||''}\n`;
-    if(imagen) msg+=`Imagen: ${imagen}\n`;
-    if(video) msg+=`Video: ${video}\n`;
-    if(spotify) msg+=`Spotify: ${spotify}\n`;
-    msg+=`\n_Compartido desde SoyIBA_`;
-    window.open("https://api.whatsapp.com/send?text="+encodeURIComponent(msg),"_blank");
-  });
-  return btn;
-}
+// Modal
+const modal = document.getElementById("modal");
+const modalContent = document.getElementById("modal-content");
+const shareBtn = document.getElementById("share-btn");
+document.querySelector(".modal-close").addEventListener("click",()=>{modal.style.display="none";});
+window.addEventListener("click",(e)=>{if(e.target==modal) modal.style.display="none";});
 
+// Compartir
+let shareData = {};
+shareBtn.addEventListener("click",()=>{
+  let msg=`*${shareData.titulo}*\n${shareData.contenido||''}\n`;
+  if(shareData.imagen) msg+=`Imagen: ${shareData.imagen}\n`;
+  if(shareData.video) msg+=`Video: ${shareData.video}\n`;
+  if(shareData.spotify) msg+=`Spotify: ${shareData.spotify}\n`;
+  msg+=`\n_Compartido desde SoyIBA_`;
+  window.open("https://api.whatsapp.com/send?text="+encodeURIComponent(msg),"_blank");
+});
+
+// Cargar datos
 async function cargarDatos(){
   const contNovedades = document.getElementById("lista-publicaciones");
   const contEventos = document.getElementById("eventContainer");
-  contNovedades.innerHTML="<p class='text-center text-gray-400'>Cargando publicaciones...</p>";
+  contNovedades.innerHTML="<p class='text-gray-400'>Cargando publicaciones...</p>";
   contEventos.innerHTML="<p class='text-gray-400'>Cargando eventos...</p>";
 
   try{
@@ -97,7 +101,6 @@ async function cargarDatos(){
     const csvText = await resp.text();
     const data = Papa.parse(csvText,{header:true,skipEmptyLines:true}).data.reverse();
 
-    // Limpiar contenedores
     contNovedades.innerHTML="";
     contEventos.innerHTML="";
 
@@ -112,45 +115,55 @@ async function cargarDatos(){
       const video = row.video||"";
       const spotify = row.spotify||"";
 
-      if(row.tipo.toLowerCase() === "evento"){
-        const card = document.createElement("div");
-        card.className="cursor-pointer min-w-[180px] bg-white rounded-xl p-3 shadow border border-gray-200 flex-shrink-0 hover:scale-105 transition relative";
+      if(row.tipo.toLowerCase()==="evento"){
+        const card=document.createElement("div");
+        card.className="card min-w-[180px]";
+        const h3=document.createElement("h3"); h3.textContent=titulo; h3.style.fontWeight="600"; card.appendChild(h3);
+        if(imagen && esImagen(imagen)){ const img=document.createElement("img"); img.src=imagen; card.appendChild(img); }
 
-        const h3 = document.createElement("h3"); h3.textContent=titulo; h3.className="font-semibold text-sm mb-1"; card.appendChild(h3);
-        if(imagen && esImagen(imagen)){ const img=document.createElement("img"); img.src=imagen; img.className="w-full h-28 object-cover rounded-lg mb-1"; card.appendChild(img); }
-
-        const desc = document.createElement("p"); desc.textContent=contenido; desc.className="text-xs text-gray-600 hidden"; card.appendChild(desc);
-
-        const shareBtn = crearBotonCompartir(titulo, contenido, imagen, video, spotify);
-        shareBtn.classList.add("text-xs"); shareBtn.style.padding="2px 4px"; shareBtn.style.position="absolute"; shareBtn.style.bottom="4px"; shareBtn.style.right="4px";
-        card.appendChild(shareBtn);
-
-        // Toggle descripción al hacer clic
-        card.addEventListener("click",()=>{ desc.classList.toggle("hidden"); });
+        card.addEventListener("click",()=>{
+          modalContent.innerHTML=`<h2 style="font-weight:600;margin-bottom:0.5rem">${titulo}</h2>
+          ${contenido?`<p style="margin-bottom:0.5rem">${contenido}</p>`:""}
+          ${imagen&&esImagen(imagen)?`<img src="${imagen}" style="width:100%;border-radius:12px;margin-bottom:0.5rem">`:""}
+          ${video?`<iframe class="w-full" src="${convertirYouTube(video)}" width="100%" height="250" frameborder="0" allowfullscreen></iframe>`:""}
+          ${spotify?`<iframe style="border-radius:12px" src="${convertirSpotify(spotify)}" width="100%" height="80" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`:""}`;
+          shareData={titulo, contenido, imagen, video, spotify};
+          modal.style.display="flex";
+        });
 
         contEventos.appendChild(card);
-      } else if(row.tipo.toLowerCase() === "novedad"){
-        const card = document.createElement("div");
-        card.className="cursor-pointer bg-white rounded-2xl shadow overflow-hidden border border-gray-200 p-4 hover:shadow-lg transition";
 
-        const h3 = document.createElement("h3"); h3.textContent=titulo; h3.className="font-semibold mb-1 text-indigo-600"; card.appendChild(h3);
-        if(contenido){ const p=document.createElement("p"); p.textContent=contenido; p.className="text-sm text-gray-600 mb-2"; card.appendChild(p); }
+      } else if(row.tipo.toLowerCase()==="novedad"){
+        const card=document.createElement("div");
+        card.className="card";
+        const h3=document.createElement("h3"); h3.textContent=titulo; h3.style.color="#4f46e5"; h3.style.marginBottom="0.25rem"; card.appendChild(h3);
+        if(contenido){ const p=document.createElement("p"); p.textContent=contenido; p.style.fontSize="0.9rem"; p.style.color="#555"; p.style.marginBottom="0.5rem"; card.appendChild(p);}
+        if(imagen){ const v = convertirYouTube(imagen); if(v){ const f=document.createElement("iframe"); f.src=v; f.width="100%"; f.height="200"; f.frameBorder="0"; f.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"; f.allowFullscreen=true; card.appendChild(f);}
+        else if(esImagen(imagen)){ const img=document.createElement("img"); img.src=imagen; card.appendChild(img);} }
+        if(video){ const vid=convertirYouTube(video); if(vid){ const f=document.createElement("iframe"); f.src=vid; f.width="100%"; f.height="200"; f.frameBorder="0"; f.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"; f.allowFullscreen=true; card.appendChild(f); } }
+        if(spotify){ const sp = convertirSpotify(spotify); if(sp){ const d=document.createElement("iframe"); d.src=sp; d.width="100%"; d.height="80"; d.frameBorder="0"; d.allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"; card.appendChild(d); } }
 
-        if(imagen){ 
-          const v = convertirEnlaceYouTube(imagen);
-          if(v) card.innerHTML+=`<iframe class="w-full h-52 rounded-lg mb-2" src="${v}" frameborder="0" allowfullscreen></iframe>`;
-          else if(esImagen(imagen)){ const img=document.createElement("img"); img.src=imagen; img.className="w-full h-48 object-cover rounded-lg mb-2"; card.appendChild(img);}
-        }
-        if(video){ const vid=convertirEnlaceYouTube(video); if(vid){ const f=document.createElement("div"); f.innerHTML=`<iframe class="w-full h-52 rounded-lg mb-2" src="${vid}" frameborder="0" allowfullscreen></iframe>`; card.appendChild(f); } }
-        if(spotify){ const sp = convertirSpotifyEnEmbed(spotify); if(sp){ const d=document.createElement("div"); d.innerHTML=`<iframe style="border-radius:12px" src="${sp}" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`; card.appendChild(d); } }
-
-        card.appendChild(crearBotonCompartir(titulo, contenido, imagen, video, spotify));
+        const shareBtnNovedad=document.createElement("button");
+        shareBtnNovedad.className="btn-share";
+        shareBtnNovedad.textContent="📤 Compartir WhatsApp";
+        shareBtnNovedad.addEventListener("click",()=>{ 
+          let msg=`*${titulo}*\n${contenido||''}\n`; 
+          if(imagen) msg+=`Imagen: ${imagen}\n`;
+          if(video) msg+=`Video: ${video}\n`;
+          if(spotify) msg+=`Spotify: ${spotify}\n`;
+          msg+=`\n_Compartido desde SoyIBA_`;
+          window.open("https://api.whatsapp.com/send?text="+encodeURIComponent(msg),"_blank");
+        });
+        card.appendChild(shareBtnNovedad);
 
         contNovedades.appendChild(card);
       }
     });
-  }catch(e){ console.error(e); contNovedades.innerHTML="<p class='text-center text-red-500'>Error al cargar publicaciones.</p>"; contEventos.innerHTML="<p class='text-red-500'>Error al cargar eventos.</p>";}
+  }catch(e){console.error(e); contNovedades.innerHTML="<p style='color:red'>Error al cargar novedades</p>"; contEventos.innerHTML="<p style='color:red'>Error al cargar eventos</p>";}
 }
 
 document.addEventListener("DOMContentLoaded", cargarDatos);
 </script>
+
+</body>
+</html>
