@@ -3,208 +3,235 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PWA Soy IBA</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Soy IBA</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
-    .story-border {
-      border: 2px solid #e1306c;
-      border-radius: 50%;
-      padding: 3px;
+    body {
+      background: radial-gradient(circle at 20% 20%, #e5d9f2, transparent 30%),
+        radial-gradient(circle at 80% 25%, #d0e1fa, transparent 30%),
+        radial-gradient(circle at 40% 80%, #c8f6f9, transparent 30%),
+        radial-gradient(circle at 70% 90%, #ffe6e6, transparent 30%),
+        #f3f7fb;
+      font-family: system-ui, sans-serif;
+      color: rgb(100, 109, 174);
     }
 
-    .fade {
-      transition: opacity 0.5s ease-in-out;
+    .event-card {
+      border: 2px solid #a8b4f9;
+      border-radius: 9999px;
+      overflow: hidden;
+      min-width: 80px;
+      height: 80px;
+      flex-shrink: 0;
+      background: white;
+    }
+
+    .event-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    #eventModal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+    }
+
+    #eventModal.active {
+      display: flex;
+    }
+
+    #eventContent {
+      position: relative;
+      width: 90%;
+      max-width: 400px;
+      height: 90%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      color: white;
+    }
+
+    #eventContent img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    #eventInfo {
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+      padding: 1rem;
+      border-radius: 0 0 1rem 1rem;
+    }
+
+    #closeEvent {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      cursor: pointer;
+      color: #444;
+    }
+
+    #countdown {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(255, 255, 255, 0.8);
+      color: #444;
+      font-size: 12px;
+      border-radius: 12px;
+      padding: 2px 6px;
     }
   </style>
 </head>
 
-<body class="bg-gray-100 text-gray-800">
-  <!-- RIBBON -->
-  <header class="flex items-center justify-between px-4 py-3 bg-white shadow">
-    <h1 class="text-2xl font-bold text-pink-600">Soy IBA</h1>
-    <div class="flex space-x-4">
-      <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
-        viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
-          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-      <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
-        viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
-          d="M21 15a2 2 0 01-2 2H5a2 2 0 01-2-2m18 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v6m18 0l-9-6-9 6" /></svg>
-    </div>
+<body class="flex flex-col min-h-screen">
+
+  <!-- Ribon superior -->
+  <header class="flex items-center justify-between p-4 bg-white shadow-md">
+    <h1 class="font-semibold text-indigo-600 text-lg">Soy IBA</h1>
+    <button class="p-2 text-indigo-500 text-xl">☰</button>
   </header>
 
-  <!-- EVENTOS -->
-  <section class="p-4">
-    <h2 class="text-lg font-semibold mb-3">Eventos</h2>
-    <div class="flex space-x-4 overflow-x-auto pb-3">
-      <div class="flex-shrink-0 text-center">
-        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=300"
-          class="w-20 h-20 object-cover rounded-full story-border cursor-pointer event"
-          data-title="Festival Gastronómico"
-          data-desc="Disfruta los sabores del mundo este fin de semana." />
-        <p class="text-sm mt-1">Festival</p>
-      </div>
+  <main class="flex-1 overflow-y-auto p-4 space-y-6">
 
-      <div class="flex-shrink-0 text-center">
-        <img src="https://images.unsplash.com/photo-1521335629791-ce4aec67dd47?w=300"
-          class="w-20 h-20 object-cover rounded-full story-border cursor-pointer event"
-          data-title="Noche de Jazz"
-          data-desc="Ven a disfrutar buena música en vivo." />
-        <p class="text-sm mt-1">Jazz</p>
-      </div>
+    <!-- Eventos -->
+    <section>
+      <h2 class="text-lg font-semibold mb-2">🎉 Eventos</h2>
+      <div id="eventos" class="flex space-x-3 overflow-x-auto pb-2"></div>
+    </section>
 
-      <div class="flex-shrink-0 text-center">
-        <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=300"
-          class="w-20 h-20 object-cover rounded-full story-border cursor-pointer event"
-          data-title="Carrera 10K"
-          data-desc="Participa en la gran carrera anual." />
-        <p class="text-sm mt-1">Carrera</p>
-      </div>
-    </div>
-  </section>
+    <!-- Novedades -->
+    <section>
+      <h2 class="text-lg font-semibold mb-2">✨ Novedades</h2>
+      <div id="novedades" class="flex flex-col items-center gap-4"></div>
+    </section>
 
-  <!-- NOVEDADES -->
-  <section class="p-4">
-    <h2 class="text-lg font-semibold mb-3">Novedades</h2>
-    <div id="novedadesContainer" class="space-y-4">
-      <p class="text-gray-500 text-center">Cargando novedades...</p>
-    </div>
-  </section>
+  </main>
 
-  <!-- MODAL EVENTO -->
-  <div id="storyModal" class="hidden fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
-    <div class="relative w-full h-full flex items-center justify-center">
-      <img id="storyImage" class="object-contain max-h-full max-w-full fade cursor-pointer" />
-      <div class="absolute bottom-0 w-full p-4 bg-gradient-to-t from-black/70 to-transparent text-white">
-        <h2 id="storyTitle" class="text-lg font-bold"></h2>
-        <p id="storyDesc" class="text-sm mb-2"></p>
-        <div class="flex justify-between items-center">
-          <span id="timer" class="text-xs bg-black/50 px-2 py-1 rounded">5s</span>
-          <button id="shareBtn" class="text-xs bg-pink-600 px-2 py-1 rounded">Compartir</button>
-        </div>
+  <!-- Modal Eventos -->
+  <div id="eventModal">
+    <div id="eventContent">
+      <div id="countdown">5</div>
+      <div id="closeEvent">✕</div>
+      <img id="eventImage" src="" alt="">
+      <div id="eventInfo">
+        <h3 id="eventTitle" class="text-lg font-semibold"></h3>
+        <p id="eventDesc" class="text-sm opacity-90"></p>
+        <button id="shareEvent"
+          class="mt-2 bg-green-500 text-white px-3 py-1 text-xs rounded-lg float-right">📤</button>
       </div>
-      <button id="closeModal" class="absolute top-3 right-3 bg-black/50 text-white px-2 py-1 rounded">✕</button>
     </div>
   </div>
 
   <script>
-    /* === CONFIGURAR TU URL DE GOOGLE SHEET AQUÍ === */
-    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
+    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
 
-    /* === EVENTOS === */
-    const events = document.querySelectorAll(".event");
-    const modal = document.getElementById("storyModal");
-    const storyImage = document.getElementById("storyImage");
-    const storyTitle = document.getElementById("storyTitle");
-    const storyDesc = document.getElementById("storyDesc");
-    const closeModal = document.getElementById("closeModal");
-    const timerEl = document.getElementById("timer");
-    const shareBtn = document.getElementById("shareBtn");
+    let eventos = [], novedades = [];
+    let currentIndex = 0, countdownInterval = null, timeLeft = 5;
 
-    let currentIndex = 0;
-    let interval;
-    let countdown;
+    async function cargarDatos() {
+      const res = await fetch(SHEET_URL);
+      const csv = await res.text();
+      const data = Papa.parse(csv, { header: true, skipEmptyLines: true }).data;
 
-    const eventList = Array.from(events).map(e => ({
-      src: e.src,
-      title: e.dataset.title,
-      desc: e.dataset.desc
-    }));
+      eventos = data.filter(d => d.Tipo?.toLowerCase() === "evento");
+      novedades = data.filter(d => d.Tipo?.toLowerCase() === "novedad").reverse();
 
-    function showEvent(index) {
-      const ev = eventList[index];
-      storyImage.src = ev.src;
-      storyTitle.textContent = ev.title;
-      storyDesc.textContent = ev.desc;
-      modal.classList.remove("hidden");
-
-      clearInterval(interval);
-      clearInterval(countdown);
-
-      let seconds = 5;
-      timerEl.textContent = `${seconds}s`;
-      countdown = setInterval(() => {
-        seconds--;
-        timerEl.textContent = `${seconds}s`;
-      }, 1000);
-
-      interval = setInterval(() => {
-        nextEvent();
-      }, 5000);
+      renderEventos();
+      renderNovedades();
     }
 
-    function nextEvent() {
-      currentIndex = (currentIndex + 1) % eventList.length;
-      showEvent(currentIndex);
-    }
-
-    events.forEach((e, i) => {
-      e.addEventListener("click", () => {
-        currentIndex = i;
-        showEvent(i);
+    function renderEventos() {
+      const cont = document.getElementById("eventos");
+      cont.innerHTML = "";
+      eventos.forEach((ev, i) => {
+        const card = document.createElement("div");
+        card.className = "event-card cursor-pointer";
+        card.innerHTML = `<img src="${ev.Imagen}" alt="${ev.Titulo}">`;
+        card.addEventListener("click", () => abrirEvento(i));
+        cont.appendChild(card);
       });
-    });
-
-    storyImage.addEventListener("click", nextEvent);
-    closeModal.addEventListener("click", () => {
-      modal.classList.add("hidden");
-      clearInterval(interval);
-      clearInterval(countdown);
-    });
-
-    shareBtn.addEventListener("click", () => {
-      navigator.share
-        ? navigator.share({ title: storyTitle.textContent, text: storyDesc.textContent, url: window.location.href })
-        : alert("Tu navegador no soporta compartir.");
-    });
-
-    /* === CARGAR NOVEDADES DESDE GOOGLE SHEETS === */
-    async function loadNovedades() {
-      const container = document.getElementById("novedadesContainer");
-      try {
-        const res = await fetch(sheetURL);
-        const text = await res.text();
-        const json = JSON.parse(text.substr(47).slice(0, -2)); // limpia el formato de Google
-        const rows = json.table.rows;
-
-        const data = rows.map(r => ({
-          Titulo: r.c[0]?.v || "",
-          Contenido: r.c[1]?.v || "",
-          Imagen: r.c[2]?.v || "",
-          Video: r.c[3]?.v || "",
-          Spotify: r.c[4]?.v || ""
-        })).reverse(); // ordena de más nuevo a más viejo
-
-        container.innerHTML = "";
-        data.forEach(n => {
-          const card = document.createElement("div");
-          card.className = "bg-white rounded-xl shadow";
-
-          let media = "";
-          if (n.Imagen) media = `<img src="${n.Imagen}" class="w-full h-60 object-cover rounded-t-xl">`;
-          else if (n.Video) media = `<video src="${n.Video}" controls class="w-full h-60 rounded-t-xl"></video>`;
-          else if (n.Spotify) media = `<iframe style="border-radius:12px" src="${n.Spotify}" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture"></iframe>`;
-
-          card.innerHTML = `
-            ${media}
-            <div class="p-3">
-              <h3 class="font-semibold">${n.Titulo}</h3>
-              <p class="text-sm text-gray-500">${new Date().toLocaleDateString()}</p>
-              <p class="text-sm mt-2">${n.Contenido}</p>
-            </div>
-          `;
-          container.appendChild(card);
-        });
-
-      } catch (e) {
-        container.innerHTML = `<p class="text-red-500 text-center">Error al cargar datos de Google Sheets</p>`;
-        console.error(e);
-      }
     }
 
-    loadNovedades();
+    function renderNovedades() {
+      const cont = document.getElementById("novedades");
+      cont.innerHTML = "";
+      novedades.forEach(nov => {
+        const card = document.createElement("div");
+        card.className = "bg-white border border-gray-200 rounded-xl shadow-sm p-4 max-w-md w-full";
+        card.innerHTML = `
+          <h3 class="font-semibold text-indigo-600">${nov.Titulo}</h3>
+          <p class="text-sm mt-1">${nov.Contenido || ""}</p>
+          ${nov.Imagen ? `<img src="${nov.Imagen}" class="rounded-lg mt-2">` : ""}
+          <p class="text-xs text-gray-500 mt-2">${nov.Fecha || ""}</p>
+          <button class="mt-2 px-3 py-1 bg-green-500 text-white rounded-lg text-xs">📤 Compartir</button>
+        `;
+        cont.appendChild(card);
+      });
+    }
+
+    function abrirEvento(index) {
+      currentIndex = index;
+      const modal = document.getElementById("eventModal");
+      const data = eventos[index];
+      document.getElementById("eventImage").src = data.Imagen;
+      document.getElementById("eventTitle").textContent = data.Titulo;
+      document.getElementById("eventDesc").textContent = data.Contenido;
+      modal.classList.add("active");
+      iniciarCuentaRegresiva();
+    }
+
+    function iniciarCuentaRegresiva() {
+      clearInterval(countdownInterval);
+      timeLeft = 5;
+      document.getElementById("countdown").textContent = timeLeft;
+      countdownInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById("countdown").textContent = timeLeft;
+        if (timeLeft <= 0) siguienteEvento();
+      }, 1000);
+    }
+
+    function siguienteEvento() {
+      clearInterval(countdownInterval);
+      currentIndex = (currentIndex + 1) % eventos.length;
+      abrirEvento(currentIndex);
+    }
+
+    document.getElementById("eventModal").addEventListener("click", siguienteEvento);
+    document.getElementById("closeEvent").addEventListener("click", e => {
+      e.stopPropagation();
+      document.getElementById("eventModal").classList.remove("active");
+      clearInterval(countdownInterval);
+    });
+
+    document.addEventListener("DOMContentLoaded", cargarDatos);
   </script>
+
 </body>
+
 </html>
 
 
