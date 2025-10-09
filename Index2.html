@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Soy IBA - Novedades</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="icon.png" />
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            background:
+                radial-gradient(circle at 20% 20%, #e5d9f2, transparent 30%),
+                radial-gradient(circle at 80% 25%, #d0e1fa, transparent 30%),
+                radial-gradient(circle at 40% 80%, #c8f6f9, transparent 30%),
+                radial-gradient(circle at 70% 90%, #ffe6e6, transparent 30%),
+                #f3f7fb;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            color: rgb(100, 109, 174);
+        }
+
+        /* Animación de entrada suave */
+        .section-hidden {
+            opacity: 0;
+            transform: translateX(50px);
+            position: absolute;
+            width: 100%;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .section-active {
+            opacity: 1;
+            transform: translateX(0);
+            position: relative;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        /* Tarjetas centradas y más angostas */
+        #lista-publicaciones {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        #lista-publicaciones>div {
+            width: 100%;
+            max-width: 500px;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col h-screen">
+
+    <!-- Header -->
+    <header class="flex items-center justify-between p-4 bg-white shadow-md">
+        <div class="flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span class="font-semibold">Iglesia Bíblica Antioquía</span>
+        </div>
+        <button id="menuBtn" class="p-2 rounded hover:bg-indigo-100">
+            ☰
+        </button>
+    </header>
+
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50 overflow-y-auto">
+        <div class="flex justify-end p-2">
+            <button id="closeSidebar" class="p-2 text-gray-600 hover:text-red-500">
+                ✕
+            </button>
+        </div>
+        <div class="p-4 space-y-4">
+            <h2 class="text-lg font-bold">Misión</h2>
+            <p>Proclamar el evangelio y discipular con amor.</p>
+            <h2 class="text-lg font-bold">Visión</h2>
+            <p>Ser una iglesia centrada en Cristo.</p>
+            <h2 class="text-lg font-bold">Lo que creemos</h2>
+            <p>Basados en la Biblia como Palabra de Dios.</p>
+            <h2 class="text-lg font-bold">Horarios</h2>
+            <ul class="list-disc pl-5">
+                <li>Domingo 8:00 y 10:00 AM</li>
+                <li>Jueves 08:00 AM Ayuno / 07:00 PM Estudio bíblico</li>
+                <li>Sábado 04:00 PM Pre Juveniles / 06:00 PM Jóvenes</li>
+                <li>Último martes 07:00 PM Oración</li>
+            </ul>
+            <h2 class="text-lg font-bold">Recomendados</h2>
+            <p>Lecturas y música edificante.</p>
+            <h2 class="text-lg font-bold">Contacto</h2>
+            <p>Calle 38asur #38-34, Envigado<br>info@iglesiaiba.org</p>
+        </div>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main id="content" class="flex-1 overflow-y-auto p-4 pb-20 relative space-y-4">
+
+        <!-- Novedades -->
+        <div id="section-transmision" class="section-active bg-white p-4 rounded-xl shadow-md space-y-3">
+            <h2 class="text-lg font-semibold text-center">✨Novedades</h2>
+            <div id="lista-publicaciones" class="text-gray-700 text-sm">
+                <p class="text-center text-gray-400">Cargando novedades...</p>
+            </div>
+        </div>
+
+        <!-- Otras secciones -->
+        <div id="section-inscripciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">📝 Inscripciones y anuncios</div>
+        <div id="section-donaciones" class="section-hidden bg-white p-4 rounded-xl shadow-md">💳 Donaciones: <br> QR + Nº Cuenta</div>
+        <div id="section-eco" class="section-hidden bg-white p-4 rounded-xl shadow-md">🌍 Grupos ECO: mapa o links</div>
+        <div id="section-recomendados" class="section-hidden bg-white p-4 rounded-xl shadow-md">⭐ Recomendados</div>
+
+    </main>
+
+    <!-- Barra de navegación inferior -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-inner flex justify-around py-2">
+        <button class="nav-btn active flex flex-col items-center text-indigo-600" data-section="transmision">
+            ✨Novedades
+        </button>
+        <button class="nav-btn flex flex-col items-center" data-section="inscripciones">
+            📝 Inscripciones
+        </button>
+        <button class="nav-btn flex flex-col items-center" data-section="donaciones">
+            💳 Donaciones
+        </button>
+        <button class="nav-btn flex flex-col items-center" data-section="eco">
+            🌍 ECO
+        </button>
+        <button class="nav-btn flex flex-col items-center" data-section="recomendados">
+            ⭐ Recomendados
+        </button>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script>
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const sections = document.querySelectorAll('main > div');
+
+        navButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                navButtons.forEach(b => b.classList.remove('text-indigo-600', 'active'));
+                btn.classList.add('text-indigo-600', 'active');
+
+                const target = "section-" + btn.dataset.section;
+                sections.forEach(sec => {
+                    sec.classList.toggle('section-active', sec.id === target);
+                    sec.classList.toggle('section-hidden', sec.id !== target);
+                });
+            });
+        });
+
+        const menuBtn = document.getElementById("menuBtn");
+        const sidebar = document.getElementById("sidebar");
+        const closeSidebar = document.getElementById("closeSidebar");
+
+        menuBtn.addEventListener("click", () => sidebar.classList.toggle("translate-x-full"));
+        closeSidebar.addEventListener("click", () => sidebar.classList.add("translate-x-full"));
+
+        const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
+
+        function esImagen(url) {
+            return !!url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url);
+        }
+
+        function convertirEnlaceYouTube(url) {
+            if (!url) return null;
+            url = url.trim();
+            let m = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/i);
+            if (m) return `https://www.youtube.com/embed/${m[1]}`;
+            m = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/i);
+            if (m) return `https://www.youtube.com/embed/${m[1]}`;
+            m = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/i);
+            if (m) return `https://www.youtube.com/embed/${m[1]}`;
+            m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/i);
+            if (m) return `https://www.youtube.com/embed/${m[1]}`;
+            return null;
+        }
+
+        function convertirSpotifyEnEmbed(url) {
+            if (!url) return null;
+            url = url.split("?")[0].replace("/intl-es", "");
+            const match = url.match(/open\.spotify\.com\/(track|album|playlist)\/([a-zA-Z0-9]+)/);
+            if (match) return `https://open.spotify.com/embed/${match[1]}/${match[2]}`;
+            return url.includes("embed") ? url : null;
+        }
+
+        async function cargarPublicaciones() {
+            const contenedor = document.getElementById("lista-publicaciones");
+            contenedor.innerHTML = "<p class='text-center text-gray-400'>Cargando publicaciones...</p>";
+
+            try {
+                const response = await fetch(URL_SHEET);
+                if (!response.ok) throw new Error("No se pudo acceder a la hoja");
+
+                const csvText = await response.text();
+                const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
+
+                contenedor.innerHTML = "";
+                if (!parsed || parsed.length === 0) {
+                    contenedor.innerHTML = "<p class='text-center text-gray-400'>No hay publicaciones todavía.</p>";
+                    return;
+                }
+
+                parsed.reverse().forEach(rawRow => {
+                    const row = {};
+                    Object.keys(rawRow).forEach(k => {
+                        const key = k ? k.trim().toLowerCase() : "";
+                        row[key] = rawRow[k] ? String(rawRow[k]).trim() : "";
+                    });
+
+                    if (!row.titulo && !row.contenido) return;
+
+                    const card = document.createElement("div");
+                    card.className = "p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm";
+
+                    if (row.fecha) {
+                        const f = document.createElement("p");
+                        f.className = "text-xs text-gray-500 mt-2 text-right";
+                        f.textContent = row.fecha;
+                        card.appendChild(f);
+                    }
+
+                    const h3 = document.createElement("h3");
+                    h3.className = "font-semibold text-indigo-600 text-base";
+                    h3.textContent = row.titulo || "Sin título";
+                    card.appendChild(h3);
+
+                    if (row.contenido) {
+                        const p = document.createElement("p");
+                        p.className = "mt-2 whitespace-pre-line text-gray-700";
+                        p.textContent = row.contenido;
+                        card.appendChild(p);
+                    }
+
+                    // Imagen o video
+                    if (row.imagen) {
+                        const videoEmbed = convertirEnlaceYouTube(row.imagen);
+                        if (videoEmbed) {
+                            const divVid = document.createElement("div");
+                            divVid.className = "mt-4";
+                            divVid.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${videoEmbed}" frameborder="0" allowfullscreen></iframe>`;
+                            card.appendChild(divVid);
+                        } else if (esImagen(row.imagen)) {
+                            const img = document.createElement("img");
+                            img.src = row.imagen;
+                            img.alt = row.titulo || "Imagen";
+                            img.className = "w-full mt-2 rounded-lg shadow-sm";
+                            img.loading = "lazy";
+                            card.appendChild(img);
+                        }
+                    }
+
+                    // Video desde columna video
+                    if (row.video) {
+                        const vid = convertirEnlaceYouTube(row.video);
+                        if (vid) {
+                            const divVid = document.createElement("div");
+                            divVid.className = "mt-4";
+                            divVid.innerHTML = `<iframe class="w-full h-52 rounded-lg shadow" src="${vid}" frameborder="0" allowfullscreen></iframe>`;
+                            card.appendChild(divVid);
+                        }
+                    }
+
+                    // Spotify
+                    if (row.spotify) {
+                        const sp = convertirSpotifyEnEmbed(row.spotify);
+                        if (sp) {
+                            const spDiv = document.createElement("div");
+                            spDiv.className = "mt-4";
+                            spDiv.innerHTML = `<iframe style="border-radius:12px" src="${sp}" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+                            card.appendChild(spDiv);
+                        }
+                    }
+
+                    // Botón compartir
+                    const shareBtn = document.createElement("button");
+                    shareBtn.className = "mt-3 px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm flex items-center justify-center gap-1";
+                    shareBtn.innerHTML = "📤 Compartir WhatsApp";
+                    shareBtn.addEventListener("click", () => {
+                        let mensaje = `*${row.titulo || "Sin título"}*\n\n`;
+                        if (row.contenido) mensaje += `${row.contenido}\n\n`;
+                        if (row.imagen) mensaje += `Imagen: ${row.imagen}\n`;
+                        if (row.video) mensaje += `Video: ${row.video}\n`;
+                        if (row.spotify) mensaje += `Spotify: ${row.spotify}\n`;
+                        mensaje += `\n_Compartido desde SoyIBA_\nhttps://jonathahndavid-svg.github.io/Babyshowerbelen/index.html`;
+                        window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(mensaje), "_blank");
+                    });
+                    card.appendChild(shareBtn);
+
+                    contenedor.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error(err);
+                contenedor.innerHTML = "<p class='text-center text-red-500'>Error al cargar publicaciones.</p>";
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", cargarPublicaciones);
+    </script>
+
+</body>
+
+</html>
