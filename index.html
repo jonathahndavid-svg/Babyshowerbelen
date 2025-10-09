@@ -275,6 +275,14 @@
                     const card = document.createElement("div");
                     card.className = "p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm";
 
+                    // Fecha
+                    if (row.fecha) {
+                        const f = document.createElement("p");
+                        f.className = "text-xs text-gray-500 mt-2 text-left";
+                        f.textContent = row.fecha;
+                        card.appendChild(f);
+                    }
+
                     // Título
                     const h3 = document.createElement("h3");
                     h3.className = "font-semibold text-indigo-600 text-base";
@@ -340,45 +348,37 @@
                     }
 
 
-                    // Fecha
-                    if (row.fecha) {
-                        const f = document.createElement("p");
-                        f.className = "text-xs text-gray-500 mt-2 text-left";
-                        f.textContent = row.fecha;
-                        card.appendChild(f);
+
+                    // Botón Compartir WhatsApp elegante
+                    const shareBtn = document.createElement("button");
+                    shareBtn.className = "mt-3 px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm flex items-center justify-center gap-1";
+                    shareBtn.innerHTML = "📤 Compartir WhatsApp";
+
+                    shareBtn.addEventListener("click", () => {
+                        // Construir mensaje dinámicamente
+                        let mensaje = `*${row.titulo || "Sin título"}*\n\n`;
+
+                        if (row.contenido) mensaje += `${row.contenido}\n\n`;
+                        if (row.imagen) mensaje += `Imagen: ${row.imagen}\n`;
+                        if (row.video) mensaje += `Video: ${row.video}\n`;
+                        if (row.spotify) mensaje += `Spotify: ${row.spotify}\n`;
+
+                        mensaje += `\n_Compartido desde SoyIBA_\nhttps://jonathahndavid-svg.github.io/Babyshowerbelen/index.html`;
+
+                        // Codificar mensaje para URL
+                        const url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(mensaje);
+
+                        // Abrir WhatsApp en nueva ventana
+                        window.open(url, "_blank");
+                    });
+
+                    // Añadir al card antes de la fecha
+                    const fechaElemento = card.querySelector(".text-xs.text-gray-500");
+                    if (fechaElemento) {
+                        card.insertBefore(shareBtn, fechaElemento);
+                    } else {
+                        card.appendChild(shareBtn);
                     }
-
-
-                   // Botón Compartir WhatsApp elegante
-const shareBtn = document.createElement("button");
-shareBtn.className = "mt-3 px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm flex items-center justify-center gap-1";
-shareBtn.innerHTML = "📤 Compartir WhatsApp";
-
-shareBtn.addEventListener("click", () => {
-    // Construir mensaje dinámicamente
-    let mensaje = `*${row.titulo || "Sin título"}*\n\n`;
-
-    if (row.contenido) mensaje += `${row.contenido}\n\n`;
-    if (row.imagen) mensaje += `Imagen: ${row.imagen}\n`;
-    if (row.video) mensaje += `Video: ${row.video}\n`;
-    if (row.spotify) mensaje += `Spotify: ${row.spotify}\n`;
-
-    mensaje += `\n_Compartido desde SoyIBA_\nhttps://jonathahndavid-svg.github.io/Babyshowerbelen/index.html`;
-
-    // Codificar mensaje para URL
-    const url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(mensaje);
-
-    // Abrir WhatsApp en nueva ventana
-    window.open(url, "_blank");
-});
-
-// Añadir al card antes de la fecha
-const fechaElemento = card.querySelector(".text-xs.text-gray-500");
-if (fechaElemento) {
-    card.insertBefore(shareBtn, fechaElemento);
-} else {
-    card.appendChild(shareBtn);
-}
 
 
                     contenedor.appendChild(card);
