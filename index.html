@@ -251,18 +251,23 @@
     
   </script>
 
-  <script>
+<script>
 async function cargarNovedades() {
   const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
 
   try {
     const response = await fetch(url);
     const data = await response.text();
-    const rows = data.split("\n").slice(1); // omite encabezados
+
+    // Dividir las filas y omitir encabezado
+    const rows = data.split("\n").slice(1);
+
+    // Convertir cada fila en un objeto
     const novedades = rows.map(row => {
-      const [Titulo, Contenido, Imagen, Video, Spotify, Fecha] = row.split(",");
-      return { Titulo, Contenido, Imagen, Video, Spotify, Fecha };
-    }).filter(n => n.Titulo); // evitar filas vacías
+      const columnas = row.split(",");
+      const [MarcaTemporal, Titulo, Contenido, Imagen, Video, Spotify, Fecha] = columnas;
+      return { MarcaTemporal, Titulo, Contenido, Imagen, Video, Spotify, Fecha };
+    }).filter(n => n.Titulo && n.Titulo.trim() !== ""); // evitar filas vacías
 
     // Ordenar por fecha (de más nueva a más vieja)
     novedades.sort((a, b) => new Date(b.Fecha) - new Date(a.Fecha));
@@ -274,12 +279,18 @@ async function cargarNovedades() {
       const card = document.createElement("div");
       card.className = "bg-white rounded-2xl shadow border border-gray-200";
 
+      // Mostrar solo un tipo de medio por prioridad: Imagen > Video > Spotify
       let multimedia = "";
-      if (n.Imagen) {
+      if (n.Imagen && n.Imagen.trim() !== "") {
         multimedia = `<img src="${n.Imagen.trim()}" class="w-full h-64 object-cover rounded-t-2xl">`;
-      } else if (n.Video) {
-        multimedia = `<iframe class="w-full h-64 rounded-t-2xl" src="${n.Video.trim()}" frameborder="0" allowfullscreen></iframe>`;
-      } else if (n.Spotify) {
+      } else if (n.Video && n.Video.trim() !== "") {
+        // Ajustar si es un link de YouTube normal
+        let videoUrl = n.Video.trim();
+        if (videoUrl.includes("watch?v=")) {
+          videoUrl = videoUrl.replace("watch?v=", "embed/");
+        }
+        multimedia = `<iframe class="w-full h-64 rounded-t-2xl" src="${videoUrl}" frameborder="0" allowfullscreen></iframe>`;
+      } else if (n.Spotify && n.Spotify.trim() !== "") {
         multimedia = `<iframe class="w-full h-20" src="${n.Spotify.trim()}" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
       }
 
@@ -317,6 +328,7 @@ window.addEventListener("DOMContentLoaded", cargarNovedades);
 </script>
 </body>
 </html>
+
 
 
 
