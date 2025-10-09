@@ -30,16 +30,12 @@ body { background: #f3f7fb; font-family: sans-serif; margin:0; }
   <p>Misión, Visión, Horarios, Contacto...</p>
 </aside>
 
+<!-- ...mantiene todo lo anterior hasta sección de eventos... -->
 <!-- Eventos próximos -->
 <section class="px-4 mt-4">
   <h2 class="text-lg font-semibold mb-2">📅 Próximos eventos</h2>
   <div class="flex overflow-x-auto gap-3 pb-2 no-scrollbar" id="eventContainer">
-    <!-- Eventos estáticos de ejemplo -->
-    <div onclick="alert('Detalle Evento')" class="cursor-pointer min-w-[160px] bg-white rounded-xl p-3 shadow border border-gray-200 flex-shrink-0 hover:scale-105 transition">
-      <img src="https://i.imgur.com/BVnLydp.jpeg" class="w-full h-20 rounded-lg object-cover mb-2">
-      <span class="text-xs font-bold text-blue-600">10 OCT</span>
-      <span class="text-sm font-medium block">Encuentro Juvenil</span>
-    </div>
+    <p class="text-gray-400">Cargando eventos...</p>
   </div>
 </section>
 
@@ -51,15 +47,7 @@ body { background: #f3f7fb; font-family: sans-serif; margin:0; }
   </div>
 </main>
 
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
-const menuBtn = document.getElementById("menuBtn");
-const sidebar = document.getElementById("sidebar");
-const closeSidebar = document.getElementById("closeSidebar");
-menuBtn.addEventListener("click",()=>sidebar.classList.toggle("translate-x-full"));
-closeSidebar.addEventListener("click",()=>sidebar.classList.add("translate-x-full"));
-
 const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
 
 function esImagen(url){ return !!url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url); }
@@ -81,47 +69,88 @@ function convertirSpotifyEnEmbed(url){
   return url.includes("embed")?url:null;
 }
 
-async function cargarPublicaciones(){
-  const cont = document.getElementById("lista-publicaciones");
-  cont.innerHTML = "<p class='text-center text-gray-400'>Cargando publicaciones...</p>";
+// Compartir WhatsApp
+function crearBotonCompartir(titulo, contenido, imagen, video, spotify){
+  const btn = document.createElement("button");
+  btn.textContent="📤 Compartir WhatsApp";
+  btn.className="mt-3 px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm w-full";
+  btn.addEventListener("click",()=>{
+    let msg=`*${titulo}*\n${contenido||''}\n`;
+    if(imagen) msg+=`Imagen: ${imagen}\n`;
+    if(video) msg+=`Video: ${video}\n`;
+    if(spotify) msg+=`Spotify: ${spotify}\n`;
+    msg+=`\n_Compartido desde SoyIBA_`;
+    window.open("https://api.whatsapp.com/send?text="+encodeURIComponent(msg),"_blank");
+  });
+  return btn;
+}
+
+async function cargarDatos(){
+  const contNovedades = document.getElementById("lista-publicaciones");
+  const contEventos = document.getElementById("eventContainer");
+  contNovedades.innerHTML="<p class='text-center text-gray-400'>Cargando publicaciones...</p>";
+  contEventos.innerHTML="<p class='text-gray-400'>Cargando eventos...</p>";
+
   try{
     const resp = await fetch(URL_SHEET);
     if(!resp.ok) throw new Error("No se pudo acceder a la hoja");
     const csvText = await resp.text();
-    const data = Papa.parse(csvText,{header:true,skipEmptyLines:true}).data;
-    cont.innerHTML = "";
-    if(!data || data.length===0){ cont.innerHTML="<p class='text-center text-gray-400'>No hay publicaciones.</p>"; return; }
-    data.reverse().forEach(raw=>{
-      const row={};
+    const data = Papa.parse(csvText,{header:true,skipEmptyLines:true}).data.reverse();
+
+    // Limpiar contenedores
+    contNovedades.innerHTML="";
+    contEventos.innerHTML="";
+
+    data.forEach(raw=>{
+      const row = {};
       Object.keys(raw).forEach(k=>row[k.trim().toLowerCase()]=String(raw[k]||"").trim());
-      if(!row.titulo && !row.contenido) return;
-      const card = document.createElement("div");
-      card.className="cursor-pointer bg-white rounded-2xl shadow overflow-hidden border border-gray-200 p-4 hover:shadow-lg transition";
+      if(!row.tipo) return;
 
-      const h3 = document.createElement("h3"); h3.textContent = row.titulo||"Sin título"; h3.className="font-semibold mb-1 text-indigo-600"; card.appendChild(h3);
-      if(row.contenido){ const p=document.createElement("p"); p.textContent=row.contenido; p.className="text-sm text-gray-600 mb-2"; card.appendChild(p); }
+      const titulo = row.titulo||"Sin título";
+      const contenido = row.contenido||"";
+      const imagen = row.imagen||"";
+      const video = row.video||"";
+      const spotify = row.spotify||"";
 
-      if(row.imagen){ 
-        const v = convertirEnlaceYouTube(row.imagen);
-        if(v) card.innerHTML+=`<iframe class="w-full h-52 rounded-lg mb-2" src="${v}" frameborder="0" allowfullscreen></iframe>`;
-        else if(esImagen(row.imagen)){ const img=document.createElement("img"); img.src=row.imagen; img.className="w-full h-48 object-cover rounded-lg mb-2"; card.appendChild(img);}
+      if(row.tipo.toLowerCase() === "evento"){
+        const card = document.createElement("div");
+        card.className="cursor-pointer min-w-[180px] bg-white rounded-xl p-3 shadow border border-gray-200 flex-shrink-0 hover:scale-105 transition relative";
+
+        const h3 = document.createElement("h3"); h3.textContent=titulo; h3.className="font-semibold text-sm mb-1"; card.appendChild(h3);
+        if(imagen && esImagen(imagen)){ const img=document.createElement("img"); img.src=imagen; img.className="w-full h-28 object-cover rounded-lg mb-1"; card.appendChild(img); }
+
+        const desc = document.createElement("p"); desc.textContent=contenido; desc.className="text-xs text-gray-600 hidden"; card.appendChild(desc);
+
+        const shareBtn = crearBotonCompartir(titulo, contenido, imagen, video, spotify);
+        shareBtn.classList.add("text-xs"); shareBtn.style.padding="2px 4px"; shareBtn.style.position="absolute"; shareBtn.style.bottom="4px"; shareBtn.style.right="4px";
+        card.appendChild(shareBtn);
+
+        // Toggle descripción al hacer clic
+        card.addEventListener("click",()=>{ desc.classList.toggle("hidden"); });
+
+        contEventos.appendChild(card);
+      } else if(row.tipo.toLowerCase() === "novedad"){
+        const card = document.createElement("div");
+        card.className="cursor-pointer bg-white rounded-2xl shadow overflow-hidden border border-gray-200 p-4 hover:shadow-lg transition";
+
+        const h3 = document.createElement("h3"); h3.textContent=titulo; h3.className="font-semibold mb-1 text-indigo-600"; card.appendChild(h3);
+        if(contenido){ const p=document.createElement("p"); p.textContent=contenido; p.className="text-sm text-gray-600 mb-2"; card.appendChild(p); }
+
+        if(imagen){ 
+          const v = convertirEnlaceYouTube(imagen);
+          if(v) card.innerHTML+=`<iframe class="w-full h-52 rounded-lg mb-2" src="${v}" frameborder="0" allowfullscreen></iframe>`;
+          else if(esImagen(imagen)){ const img=document.createElement("img"); img.src=imagen; img.className="w-full h-48 object-cover rounded-lg mb-2"; card.appendChild(img);}
+        }
+        if(video){ const vid=convertirEnlaceYouTube(video); if(vid){ const f=document.createElement("div"); f.innerHTML=`<iframe class="w-full h-52 rounded-lg mb-2" src="${vid}" frameborder="0" allowfullscreen></iframe>`; card.appendChild(f); } }
+        if(spotify){ const sp = convertirSpotifyEnEmbed(spotify); if(sp){ const d=document.createElement("div"); d.innerHTML=`<iframe style="border-radius:12px" src="${sp}" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`; card.appendChild(d); } }
+
+        card.appendChild(crearBotonCompartir(titulo, contenido, imagen, video, spotify));
+
+        contNovedades.appendChild(card);
       }
-
-      if(row.video){ const vid=convertirEnlaceYouTube(row.video); if(vid){ const f=document.createElement("div"); f.innerHTML=`<iframe class="w-full h-52 rounded-lg mb-2" src="${vid}" frameborder="0" allowfullscreen></iframe>`; card.appendChild(f); } }
-      if(row.spotify){ const sp = convertirSpotifyEnEmbed(row.spotify); if(sp){ const d=document.createElement("div"); d.innerHTML=`<iframe style="border-radius:12px" src="${sp}" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`; card.appendChild(d); } }
-
-      const shareBtn = document.createElement("button");
-      shareBtn.textContent="📤 Compartir WhatsApp";
-      shareBtn.className="mt-3 px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm w-full";
-      shareBtn.addEventListener("click",()=>{ let msg=`*${row.titulo}*\n${row.contenido||''}\n`; if(row.imagen) msg+=`Imagen: ${row.imagen}\n`; if(row.video) msg+=`Video: ${row.video}\n`; if(row.spotify) msg+=`Spotify: ${row.spotify}\n`; msg+=`\n_Compartido desde SoyIBA_`; window.open("https://api.whatsapp.com/send?text="+encodeURIComponent(msg),"_blank"); });
-      card.appendChild(shareBtn);
-
-      cont.appendChild(card);
     });
-  }catch(e){ cont.innerHTML="<p class='text-center text-red-500'>Error al cargar publicaciones.</p>"; console.error(e);}
+  }catch(e){ console.error(e); contNovedades.innerHTML="<p class='text-center text-red-500'>Error al cargar publicaciones.</p>"; contEventos.innerHTML="<p class='text-red-500'>Error al cargar eventos.</p>";}
 }
 
-document.addEventListener("DOMContentLoaded", cargarPublicaciones);
+document.addEventListener("DOMContentLoaded", cargarDatos);
 </script>
-</body>
-</html>
