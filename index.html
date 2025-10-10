@@ -338,7 +338,7 @@ async function cargarNovedades(){
       const y=convertirEnlaceYouTube(vid);
       if(y)media.push(`<iframe class="w-full h-64 rounded-xl" src="${y}" frameborder="0" allowfullscreen></iframe>`);
       const s=convertirSpotifyEnEmbed(spot);
-      if(s)media.push(`<iframe class="w-full h-64 rounded-xl" src="${s}" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`);
+      if(s)media.push(`<div class="w-full h-64 flex items-center justify-center rounded-xl bg-black/10"><iframe class="w-full h-20 rounded-xl" src="${s}" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe></div>`);
 
       let multimediaHTML="";
       if(media.length>1){
