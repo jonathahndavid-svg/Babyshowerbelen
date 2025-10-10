@@ -291,109 +291,83 @@
 <script>
 const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSyHmU-0ZwmCIFmwaaiC8FLVhSU4n6GNBh4JGtlgf89LWG-4wVW_7Awh8ICilQi5xd5qDVEnfyC2i2O/pub?output=csv";
 
-// --- Funciones auxiliares multimedia ---
-function esImagen(url) {
-  return !!url && /\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url);
+function esImagen(url){return !!url&&/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url);}
+function convertirEnlaceYouTube(url){
+  if(!url)return null;
+  url=String(url).trim();
+  let m=url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/i);
+  if(m)return`https://www.youtube.com/embed/${m[1]}`;
+  m=url.match(/[?&]v=([a-zA-Z0-9_-]{11})/i);
+  if(m)return`https://www.youtube.com/embed/${m[1]}`;
+  m=url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/i);
+  if(m)return`https://www.youtube.com/embed/${m[1]}`;
+  m=url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/i);
+  if(m)return`https://www.youtube.com/embed/${m[1]}`;
+  return null;
 }
-
-function convertirEnlaceYouTube(url) {
-  if (!url) return null;
-  url = String(url).trim();
-  let m = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/i);
-  if (m) return `https://www.youtube.com/embed/${m[1]}`;
-  m = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/i);
-  if (m) return `https://www.youtube.com/embed/${m[1]}`;
-  m = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/i);
-  if (m) return `https://www.youtube.com/embed/${m[1]}`;
-  m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/i);
-  if (m) return `https://www.youtube.com/embed/${m[1]}`;
+function convertirSpotifyEnEmbed(url){
+  if(!url)return null;
+  url=url.split("?")[0];url=url.replace("/intl-es","");
+  const m=url.match(/open\.spotify\.com\/(track|album|playlist)\/([a-zA-Z0-9]+)/);
+  if(m)return`https://open.spotify.com/embed/${m[1]}/${m[2]}`;
+  if(url.includes("embed"))return url;
   return null;
 }
 
-function convertirSpotifyEnEmbed(url) {
-  if (!url) return null;
-  url = url.split("?")[0];
-  url = url.replace("/intl-es", "");
-  const match = url.match(/open\.spotify\.com\/(track|album|playlist)\/([a-zA-Z0-9]+)/);
-  if (match) return `https://open.spotify.com/embed/${match[1]}/${match[2]}`;
-  if (url.includes("embed")) return url;
-  return null;
-}
+async function cargarNovedades(){
+  const cont=document.getElementById("novedades");
+  if(!cont)return;
+  cont.innerHTML="<p class='text-center text-gray-400'>Cargando novedades...</p>";
+  try{
+    const r=await fetch(URL_SHEET);
+    const csv=await r.text();
+    const data=Papa.parse(csv,{header:true,skipEmptyLines:true}).data;
+    cont.innerHTML="";
+    data.sort((a,b)=>new Date(b.Fecha)-new Date(a.Fecha));
 
-// --- Cargar novedades desde la Sheet ---
-async function cargarNovedades() {
-  const contenedor = document.getElementById("novedades");
-  if (!contenedor) return;
-  contenedor.innerHTML = "<p class='text-center text-gray-400'>Cargando novedades...</p>";
+    data.forEach((row,i)=>{
+      const titulo=row.Titulo?.trim()||"Sin título";
+      const contenido=row.Contenido?.trim()||"";
+      const img=row.Imagen?.trim()||"";
+      const vid=row.Video?.trim()||"";
+      const spot=row.Spotify?.trim()||"";
+      const fecha=row.Fecha?.trim()||"";
+      const media=[];
 
-  try {
-    const response = await fetch(URL_SHEET);
-    const csvText = await response.text();
-    const data = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
+      if(esImagen(img))media.push(`<img src="${img}" class="w-full h-64 object-cover rounded-xl">`);
+      const y=convertirEnlaceYouTube(vid);
+      if(y)media.push(`<iframe class="w-full h-64 rounded-xl" src="${y}" frameborder="0" allowfullscreen></iframe>`);
+      const s=convertirSpotifyEnEmbed(spot);
+      if(s)media.push(`<iframe class="w-full h-20 rounded-xl" src="${s}" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`);
 
-    contenedor.innerHTML = "";
-
-    // Ordenar por fecha (más recientes primero)
-    data.sort((a, b) => new Date(b.Fecha) - new Date(a.Fecha));
-
-    data.forEach(row => {
-      const titulo = row.Titulo?.trim() || "Sin título";
-      const contenido = row.Contenido?.trim() || "";
-      const imagen = row.Imagen?.trim() || "";
-      const video = row.Video?.trim() || "";
-      const spotify = row.Spotify?.trim() || "";
-      const fecha = row.Fecha?.trim() || "";
-
-      // --- Construir lista de medios disponibles ---
-      const media = [];
-
-      if (esImagen(imagen)) {
-        media.push(`<img src="${imagen}" class="w-full h-64 object-cover rounded-xl" />`);
-      }
-
-      const youtubeEmbed = convertirEnlaceYouTube(video);
-      if (youtubeEmbed) {
-        media.push(`
-          <iframe class="w-full h-64 rounded-xl"
-            src="${youtubeEmbed}"
-            frameborder="0"
-            allowfullscreen></iframe>
-        `);
-      }
-
-      const spotifyEmbed = convertirSpotifyEnEmbed(spotify);
-      if (spotifyEmbed) {
-        media.push(`
-          <iframe class="w-full h-20 rounded-xl"
-            src="${spotifyEmbed}"
-            frameborder="0"
-            allowtransparency="true"
-            allow="encrypted-media"></iframe>
-        `);
-      }
-
-      // --- Crear carrusel si hay más de un medio ---
-      let multimediaHTML = "";
-      if (media.length > 1) {
-        multimediaHTML = `
-          <div class="relative overflow-hidden">
-            <div class="flex overflow-x-auto snap-x snap-mandatory space-x-2 pb-2 scrollbar-hide">
-              ${media.map(m => `<div class="flex-shrink-0 w-full snap-center">${m}</div>`).join("")}
-            </div>
-            <div class="absolute bottom-1 left-0 right-0 flex justify-center space-x-1">
-              ${media.map(() => `<div class="w-2 h-2 bg-gray-300 rounded-full"></div>`).join("")}
-            </div>
+      let multimediaHTML="";
+      if(media.length>1){
+        const id=`carousel-${i}`;
+        multimediaHTML=`
+        <div class="relative overflow-hidden">
+          <div id="${id}" class="flex overflow-x-auto snap-x snap-mandatory space-x-2 pb-2 scrollbar-hide scroll-smooth">
+            ${media.map(m=>`<div class="flex-shrink-0 w-full snap-center">${m}</div>`).join("")}
           </div>
-        `;
-      } else if (media.length === 1) {
-        multimediaHTML = media[0];
+          <div class="absolute bottom-1 left-0 right-0 flex justify-center space-x-1">
+            ${media.map((_,j)=>`<div class="dot w-2 h-2 ${j===0?'bg-pink-500':'bg-gray-300'} rounded-full"></div>`).join("")}
+          </div>
+        </div>`;
+        setTimeout(()=>{ // activar dots dinámicos
+          const carousel=document.getElementById(id);
+          const dots=carousel.parentElement.querySelectorAll(".dot");
+          carousel.addEventListener("scroll",()=>{
+            const index=Math.round(carousel.scrollLeft/carousel.clientWidth);
+            dots.forEach((d,k)=>d.classList.toggle("bg-pink-500",k===index));
+            dots.forEach((d,k)=>d.classList.toggle("bg-gray-300",k!==index));
+          });
+        },300);
+      } else if(media.length===1){
+        multimediaHTML=media[0];
       }
 
-      // --- Crear card completa ---
-      const card = document.createElement("div");
-      card.className = "bg-white rounded-2xl shadow border border-gray-200 overflow-hidden";
-
-      card.innerHTML = `
+      const card=document.createElement("div");
+      card.className="bg-white rounded-2xl shadow border border-gray-200 overflow-hidden";
+      card.innerHTML=`
         ${multimediaHTML}
         <div class="p-3">
           <h2 class="font-semibold text-lg">${titulo}</h2>
@@ -402,50 +376,39 @@ async function cargarNovedades() {
             <span class="text-xs text-gray-400">Publicado: ${fecha}</span>
             <button class="text-pink-600 text-sm" onclick="sharePost('${titulo}')">Compartir</button>
           </div>
-        </div>
-      `;
-
-      contenedor.appendChild(card);
+        </div>`;
+      cont.appendChild(card);
     });
-  } catch (err) {
-    console.error("Error al cargar la hoja:", err);
-    contenedor.innerHTML = "<p class='text-center text-red-500'>Error al cargar novedades.</p>";
+  }catch(e){
+    console.error("Error al cargar la hoja:",e);
+    cont.innerHTML="<p class='text-center text-red-500'>Error al cargar novedades.</p>";
   }
 }
 
-// --- Función de compartir ---
-function sharePost(titulo) {
-  if (navigator.share) {
-    navigator.share({
-      title: titulo,
-      text: "Mira esta novedad:",
-      url: window.location.href
-    });
-  } else {
-    alert("Tu navegador no soporta la función de compartir");
-  }
+function sharePost(titulo){
+  if(navigator.share){
+    navigator.share({title:titulo,text:"Mira esta novedad:",url:window.location.href});
+  }else alert("Tu navegador no soporta compartir");
 }
 
-document.addEventListener("DOMContentLoaded", cargarNovedades);
+document.addEventListener("DOMContentLoaded",cargarNovedades);
 
-// --- Menú popup ---
-const configBtn = document.getElementById('configBtn');
-const menuPopup = document.getElementById('menuPopup');
-
-if (configBtn && menuPopup) {
-  configBtn.addEventListener('click', (e) => {
+// menú popup
+const configBtn=document.getElementById('configBtn');
+const menuPopup=document.getElementById('menuPopup');
+if(configBtn&&menuPopup){
+  configBtn.addEventListener('click',e=>{
     e.stopPropagation();
     menuPopup.classList.toggle('hidden');
-    const expanded = menuPopup.classList.contains('hidden') ? 'false' : 'true';
-    configBtn.setAttribute('aria-expanded', expanded);
-    menuPopup.setAttribute('aria-hidden', expanded === 'false');
+    const exp=menuPopup.classList.contains('hidden')?'false':'true';
+    configBtn.setAttribute('aria-expanded',exp);
+    menuPopup.setAttribute('aria-hidden',exp==='false');
   });
-
-  window.addEventListener('click', (e) => {
-    if (!configBtn.contains(e.target) && !menuPopup.contains(e.target)) {
+  window.addEventListener('click',e=>{
+    if(!configBtn.contains(e.target)&&!menuPopup.contains(e.target)){
       menuPopup.classList.add('hidden');
-      configBtn.setAttribute('aria-expanded', 'false');
-      menuPopup.setAttribute('aria-hidden', 'true');
+      configBtn.setAttribute('aria-expanded','false');
+      menuPopup.setAttribute('aria-hidden','true');
     }
   });
 }
