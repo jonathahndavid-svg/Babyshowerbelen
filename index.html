@@ -339,10 +339,10 @@ async function cargarNovedades(){
       if(y)media.push(`<iframe class="w-full h-64 rounded-xl" src="${y}" frameborder="0" allowfullscreen></iframe>`);
       const s=convertirSpotifyEnEmbed(spot);
    if (s) media.push(`
-  <div class="w-full h-64 rounded-xl overflow-hidden flex items-center justify-center bg-grey">
+  <div class="w-full h-64 rounded-xl overflow-hidden flex items-center justify-center bg-gray">
     <iframe
       src="${s}"
-      class="w-[90%] h-[90%] rounded-xl"
+      class="w-[90%] h-[280px] rounded-xl"
       style="border:none;"
       allowtransparency="true"
       allow="encrypted-media"
