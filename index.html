@@ -338,7 +338,7 @@ async function cargarNovedades(){
       const y=convertirEnlaceYouTube(vid);
       if(y)media.push(`<iframe class="w-full h-64 rounded-xl" src="${y}" frameborder="0" allowfullscreen></iframe>`);
       const s=convertirSpotifyEnEmbed(spot);
-  if (s) media.push(`
+if (s) media.push(`
   <div class="relative w-full h-64 rounded-xl overflow-hidden bg-black flex items-center justify-center">
     <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%]">
       <iframe
@@ -352,7 +352,7 @@ async function cargarNovedades(){
     </div>
   </div>
 `);
-`);
+
 
 
 
