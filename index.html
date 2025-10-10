@@ -338,18 +338,19 @@ async function cargarNovedades(){
       const y=convertirEnlaceYouTube(vid);
       if(y)media.push(`<iframe class="w-full h-64 rounded-xl" src="${y}" frameborder="0" allowfullscreen></iframe>`);
       const s=convertirSpotifyEnEmbed(spot);
-     if (s) media.push(`
+   if (s) media.push(`
   <div class="w-full h-64 rounded-xl overflow-hidden flex items-center justify-center bg-black">
     <iframe
       src="${s}"
-      class="w-full h-full scale-150"
-      style="transform: scale(1.25); transform-origin: center; border: none;"
+      class="w-[90%] h-[90px] rounded-xl"
+      style="border:none;"
       allowtransparency="true"
       allow="encrypted-media"
       loading="lazy">
     </iframe>
   </div>
 `);
+
 
 
       let multimediaHTML="";
