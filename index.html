@@ -344,30 +344,55 @@ async function cargarNovedades() {
       const spotify = row.Spotify?.trim() || "";
       const fecha = row.Fecha?.trim() || "";
 
-      // Crear card base
+      // --- Construir lista de medios disponibles ---
+      const media = [];
+
+      if (esImagen(imagen)) {
+        media.push(`<img src="${imagen}" class="w-full h-64 object-cover rounded-xl" />`);
+      }
+
+      const youtubeEmbed = convertirEnlaceYouTube(video);
+      if (youtubeEmbed) {
+        media.push(`
+          <iframe class="w-full h-64 rounded-xl"
+            src="${youtubeEmbed}"
+            frameborder="0"
+            allowfullscreen></iframe>
+        `);
+      }
+
+      const spotifyEmbed = convertirSpotifyEnEmbed(spotify);
+      if (spotifyEmbed) {
+        media.push(`
+          <iframe class="w-full h-20 rounded-xl"
+            src="${spotifyEmbed}"
+            frameborder="0"
+            allowtransparency="true"
+            allow="encrypted-media"></iframe>
+        `);
+      }
+
+      // --- Crear carrusel si hay más de un medio ---
+      let multimediaHTML = "";
+      if (media.length > 1) {
+        multimediaHTML = `
+          <div class="relative overflow-hidden">
+            <div class="flex overflow-x-auto snap-x snap-mandatory space-x-2 pb-2 scrollbar-hide">
+              ${media.map(m => `<div class="flex-shrink-0 w-full snap-center">${m}</div>`).join("")}
+            </div>
+            <div class="absolute bottom-1 left-0 right-0 flex justify-center space-x-1">
+              ${media.map(() => `<div class="w-2 h-2 bg-gray-300 rounded-full"></div>`).join("")}
+            </div>
+          </div>
+        `;
+      } else if (media.length === 1) {
+        multimediaHTML = media[0];
+      }
+
+      // --- Crear card completa ---
       const card = document.createElement("div");
       card.className = "bg-white rounded-2xl shadow border border-gray-200 overflow-hidden";
 
-      // Determinar contenido multimedia
-      let multimediaHTML = "";
-      if (esImagen(imagen)) {
-        multimediaHTML = `<img src="${imagen}" class="w-full h-64 object-cover rounded-t-2xl">`;
-      } else if (convertirEnlaceYouTube(video)) {
-        multimediaHTML = `
-          <iframe class="w-full h-64 rounded-t-2xl"
-            src="${convertirEnlaceYouTube(video)}"
-            frameborder="0"
-            allowfullscreen></iframe>`;
-      } else if (convertirSpotifyEnEmbed(spotify)) {
-        multimediaHTML = `
-          <iframe class="w-full h-20 rounded-t-2xl"
-            src="${convertirSpotifyEnEmbed(spotify)}"
-            frameborder="0"
-            allowtransparency="true"
-            allow="encrypted-media"></iframe>`;
-      }
-
-      // Armar contenido HTML
       card.innerHTML = `
         ${multimediaHTML}
         <div class="p-3">
@@ -403,27 +428,27 @@ function sharePost(titulo) {
 
 document.addEventListener("DOMContentLoaded", cargarNovedades);
 
- // Menu popup control: toggle and close by clicking outside
-    const configBtn = document.getElementById('configBtn');
-    const menuPopup = document.getElementById('menuPopup');
+// --- Menú popup ---
+const configBtn = document.getElementById('configBtn');
+const menuPopup = document.getElementById('menuPopup');
 
-    configBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      menuPopup.classList.toggle('hidden');
-      const expanded = menuPopup.classList.contains('hidden') ? 'false' : 'true';
-      configBtn.setAttribute('aria-expanded', expanded);
-      menuPopup.setAttribute('aria-hidden', expanded === 'false');
-    });
+if (configBtn && menuPopup) {
+  configBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    menuPopup.classList.toggle('hidden');
+    const expanded = menuPopup.classList.contains('hidden') ? 'false' : 'true';
+    configBtn.setAttribute('aria-expanded', expanded);
+    menuPopup.setAttribute('aria-hidden', expanded === 'false');
+  });
 
-    window.addEventListener('click', (e) => {
-      // if click is outside both the button and the popup, hide popup
-      if (!configBtn.contains(e.target) && !menuPopup.contains(e.target)) {
-        menuPopup.classList.add('hidden');
-        configBtn.setAttribute('aria-expanded', 'false');
-        menuPopup.setAttribute('aria-hidden', 'true');
-      }
-    });
-
+  window.addEventListener('click', (e) => {
+    if (!configBtn.contains(e.target) && !menuPopup.contains(e.target)) {
+      menuPopup.classList.add('hidden');
+      configBtn.setAttribute('aria-expanded', 'false');
+      menuPopup.setAttribute('aria-hidden', 'true');
+    }
+  });
+}
 </script>
 </body>
 </html>
